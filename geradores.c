@@ -28,6 +28,20 @@
     scalabily if the size of the processing window were altered. 
     -------------------------------------------------------------------------------------------------------------- */
 
+fftw_complex *resposta_h_buffer(int SAMPLING_WINDOW_SIZE){
+
+    fftw_complex *devolutiva;
+    devolutiva = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
+
+    // limpar a regiao de memoria
+    int j;
+    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) devolutiva[j] = 0;
+
+    // atualizar todos os coeficientes nao nulos
+    devolutiva[0] = 1.0f;
+
+    return devolutiva;
+}
 fftw_complex *resposta_h_media_movel(int SAMPLING_WINDOW_SIZE, int ORDER){
 
     fftw_complex *devolutiva;
