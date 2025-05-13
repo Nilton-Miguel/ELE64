@@ -14,7 +14,7 @@ int main(){
     fftw_complex * resposta_media_movel;
     resposta_media_movel = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
 
-    resposta_media_movel = media_movel(SAMPLING_WINDOW_SIZE, 50);
+    resposta_media_movel = resposta_h_media_movel(SAMPLING_WINDOW_SIZE, 50);
 
     printf("\n");
     for(i=0; i<SAMPLING_WINDOW_SIZE; i++){

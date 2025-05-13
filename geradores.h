@@ -7,6 +7,6 @@
 #include <complex.h>
 #include <fftw3.h>
 
-fftw_complex *media_movel(int SAMPLING_WINDOW_SIZE, int ORDER);
+fftw_complex *resposta_h_media_movel(int SAMPLING_WINDOW_SIZE, int ORDER);
 
 #endif
