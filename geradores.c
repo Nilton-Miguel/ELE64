@@ -35,7 +35,7 @@ void resposta_h_buffer(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE){
     for(j=0; j<SAMPLING_WINDOW_SIZE; j++) vetor[j] = 0;
 
     // atualizar todos os coeficientes nao nulos
-    vetor[0] = 1.0f;
+    vetor[0] = 2.0f;
 }
 void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int ORDER){
 

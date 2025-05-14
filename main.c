@@ -9,7 +9,7 @@
 #include <string.h>
 #include <math.h>
 
-#define SAMPLING_WINDOW_SIZE 256
+#define SAMPLING_WINDOW_SIZE 1024
 int i;
 
 int main(){
@@ -44,7 +44,7 @@ int main(){
     // amostragem do sinal
     for(i=0;i<SAMPLING_WINDOW_SIZE;i++){
 
-        sinal[i] = sin(2*M_PI*i/(SAMPLING_WINDOW_SIZE/2));
+        sinal[i] = sin(2*M_PI*i/(SAMPLING_WINDOW_SIZE/2)) + 0.05*(float)rand()/(float)(RAND_MAX);
     }
 
     // executar a DFT do sinal e produto com os efeitos
@@ -56,12 +56,26 @@ int main(){
     for(i=0;i<SAMPLING_WINDOW_SIZE;i++) saida[i] /= SAMPLING_WINDOW_SIZE;
     // -------------------------------------------------------------------------------------------------------------------
 
+    // plotagem do sinal pre e pos filtro
+    //------------------------------------------------------------------------------------------------------------------
+    FILE *fp = NULL;
+    FILE *gnupipe = NULL;
+    char *GnuCommands [] = {"plot 'data.tmp' using 1:2 with points pt 7 ps 0.3, '' using 1:3 with points pt 7 ps 0.3"};
+
+    fp = fopen("data.tmp", "w");
+    gnupipe = popen("gnuplot -persistent", "w");
+    //------------------------------------------------------------------------------------------------------------------
     printf("\n");
     for(i=0; i<SAMPLING_WINDOW_SIZE; i++){
 
-        printf("%d: (%f)+j(%f)\n", i, creal(saida[i]), cimag(saida[i]));
+        fprintf(fp, "%d %f %f\n", i, creal(sinal[i]), creal(saida[i]));
     }
+    // invocar o gnuplot
+    fprintf(gnupipe, "%s\n", GnuCommands[0]);
+    //------------------------------------------------------------------------------------------------------------------
 
+
+    // desalocar tudo
     fftw_free(h);
     fftw_free(sinal);
     fftw_free(saida);
