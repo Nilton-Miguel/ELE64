@@ -28,14 +28,14 @@
     scalabily if the size of the processing window were altered. 
     -------------------------------------------------------------------------------------------------------------- */
 
-void resposta_h_buffer(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE){
+void resposta_h_amplificador(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, float ganho){
 
     // limpar a regiao de memoria
     int j;
     for(j=0; j<SAMPLING_WINDOW_SIZE; j++) vetor[j] = 0;
 
     // atualizar todos os coeficientes nao nulos
-    vetor[0] = 2.0f;
+    vetor[0] = ganho;
 }
 void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int ORDER){
 

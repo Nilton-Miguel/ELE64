@@ -14,6 +14,7 @@ int i;
 
 int main(){
 
+    // -------------------------------------------------------------------------------------------------------------------
     // alocar memoria para sinal
     fftw_complex * sinal;
     sinal = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
@@ -25,11 +26,12 @@ int main(){
     // alocar memoria para os efeitos
     fftw_complex * h;
     h = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
+    // -------------------------------------------------------------------------------------------------------------------
 
     // calcular as DFT dos efeitos
     fftw_plan plano_dft_h;
     plano_dft_h = fftw_plan_dft_1d(SAMPLING_WINDOW_SIZE, h, h, FFTW_FORWARD, FFTW_MEASURE);
-    resposta_h_buffer(h, SAMPLING_WINDOW_SIZE);
+    resposta_h_amplificador(h, SAMPLING_WINDOW_SIZE, 2.0);
     fftw_execute(plano_dft_h);
 
     // preparar os planos para o sinal
@@ -56,7 +58,7 @@ int main(){
     for(i=0;i<SAMPLING_WINDOW_SIZE;i++) saida[i] /= SAMPLING_WINDOW_SIZE;
     // -------------------------------------------------------------------------------------------------------------------
 
-    // plotagem do sinal pre e pos filtro
+    // plotagem
     //------------------------------------------------------------------------------------------------------------------
     FILE *fp = NULL;
     FILE *gnupipe = NULL;
@@ -73,7 +75,6 @@ int main(){
     // invocar o gnuplot
     fprintf(gnupipe, "%s\n", GnuCommands[0]);
     //------------------------------------------------------------------------------------------------------------------
-
 
     // desalocar tudo
     fftw_free(h);
