@@ -7,8 +7,8 @@
 #include <complex.h>
 #include <fftw3.h>
 
-fftw_complex *resposta_h_buffer(int SAMPLING_WINDOW_SIZE);
+void resposta_h_buffer(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE);
 
-fftw_complex *resposta_h_media_movel(int SAMPLING_WINDOW_SIZE, int ORDER);
+void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int ORDER);
 
 #endif

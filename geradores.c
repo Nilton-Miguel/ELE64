@@ -28,33 +28,23 @@
     scalabily if the size of the processing window were altered. 
     -------------------------------------------------------------------------------------------------------------- */
 
-fftw_complex *resposta_h_buffer(int SAMPLING_WINDOW_SIZE){
-
-    fftw_complex *devolutiva;
-    devolutiva = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
+void resposta_h_buffer(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE){
 
     // limpar a regiao de memoria
     int j;
-    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) devolutiva[j] = 0;
+    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) vetor[j] = 0;
 
     // atualizar todos os coeficientes nao nulos
-    devolutiva[0] = 1.0f;
-
-    return devolutiva;
+    vetor[0] = 1.0f;
 }
-fftw_complex *resposta_h_media_movel(int SAMPLING_WINDOW_SIZE, int ORDER){
-
-    fftw_complex *devolutiva;
-    devolutiva = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
+void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int ORDER){
 
     // limpar a regiao de memoria
     int j;
-    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) devolutiva[j] = 0;
+    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) vetor[j] = 0;
 
     // atualizar todos os coeficientes nao nulos
     double coeficiente = 1.0f / ORDER;
-    devolutiva[0] = coeficiente;
-    for(j=0; j<ORDER; j++) devolutiva[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
-
-    return devolutiva;
+    vetor[0] = coeficiente;
+    for(j=0; j<ORDER; j++) vetor[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
 }
