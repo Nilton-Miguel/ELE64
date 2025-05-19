@@ -14,76 +14,61 @@ int i;
 
 int main(){
 
-    // -------------------------------------------------------------------------------------------------------------------
-    // alocar memoria para sinal
-    fftw_complex * sinal;
-    sinal = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
+    float amplitude = 100;
+    int sampling_rate = 8192;
+    int time_length = 5;
+    int signal_length = time_length * sampling_rate;
+    fftw_complex *sinal;
+    sinal = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
-    // alocar memoria para saida
-    fftw_complex * saida;
-    saida = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
+    frequencia_pura(sinal, signal_length, sampling_rate, 65.0, 5000.0);
 
-    // alocar memoria para os efeitos
-    fftw_complex * h;
-    h = (fftw_complex*) fftw_malloc(SAMPLING_WINDOW_SIZE * sizeof(fftw_complex));
-    // -------------------------------------------------------------------------------------------------------------------
+    //audio output ------------------------------------------------------------------------------------------------------
 
-    // calcular as DFT dos efeitos
-    fftw_plan plano_dft_h;
-    plano_dft_h = fftw_plan_dft_1d(SAMPLING_WINDOW_SIZE, h, h, FFTW_FORWARD, FFTW_MEASURE);
-    resposta_h_amplificador(h, SAMPLING_WINDOW_SIZE, 2.0);
-    fftw_execute(plano_dft_h);
+        short int *sinal_escrita;
+        sinal_escrita = (short int *) malloc(signal_length * sizeof(short int));
+        rebaixar_16bits(sinal, sinal_escrita, signal_length);
 
-    // preparar os planos para o sinal
-    fftw_plan plano_dft_sinal;
-    fftw_plan plano_idft_sinal;
+        wav_header wav_file_header;
 
-    plano_dft_sinal =  fftw_plan_dft_1d(SAMPLING_WINDOW_SIZE, sinal, saida, FFTW_FORWARD,  FFTW_MEASURE);
-    plano_idft_sinal = fftw_plan_dft_1d(SAMPLING_WINDOW_SIZE, saida, saida, FFTW_BACKWARD, FFTW_MEASURE);
+        strncpy(wav_file_header.data, "data", 4);
+        strncpy(wav_file_header.riff, "RIFF", 4);
+        strncpy(wav_file_header.fmt,  "fmt ", 4);
+        strncpy(wav_file_header.wave, "WAVE", 4);
+        wav_file_header.chunk_size          = 16;
+        wav_file_header.format_tag          = 1;
+        wav_file_header.num_chans           = 1;
+        wav_file_header.sample_rate         = sampling_rate;
+        wav_file_header.bits_per_sample     = 16;
+        wav_file_header.bytes_per_sample    = (wav_file_header.bits_per_sample / 8) * wav_file_header.num_chans;
+        wav_file_header.bytes_per_second    = wav_file_header.bytes_per_sample * wav_file_header.sample_rate;
 
-    // futuro loop logico da aplicacao -----------------------------------------------------------------------------------
+        const int buffer_size   = wav_file_header.sample_rate * time_length;
 
-    // amostragem do sinal
-    for(i=0;i<SAMPLING_WINDOW_SIZE;i++){
+        wav_file_header.dlength = buffer_size * wav_file_header.bytes_per_sample;
+        wav_file_header.flength = wav_file_header.dlength + 44;
 
-        sinal[i] = sin(2*M_PI*i/(SAMPLING_WINDOW_SIZE/2)) + 0.05*(float)rand()/(float)(RAND_MAX);
-    }
+        FILE *wav_file_pointer = fopen("output.wav", "w");
+        fwrite(&wav_file_header, 1, sizeof(wav_file_header), wav_file_pointer);
+        fwrite(sinal_escrita, 8, signal_length, wav_file_pointer);
 
-    // executar a DFT do sinal e produto com os efeitos
-    fftw_execute(plano_dft_sinal);
-    for(i=0;i<SAMPLING_WINDOW_SIZE;i++) saida[i] *= h[i];
-
-    // executar a IDFT do sinal e normalizar o vetor
-    fftw_execute(plano_idft_sinal);
-    for(i=0;i<SAMPLING_WINDOW_SIZE;i++) saida[i] /= SAMPLING_WINDOW_SIZE;
-    // -------------------------------------------------------------------------------------------------------------------
-
-    // plotagem
-    //------------------------------------------------------------------------------------------------------------------
+    // plotagem --------------------------------------------------------------------------------------------------------
     FILE *fp = NULL;
     FILE *gnupipe = NULL;
-    char *GnuCommands [] = {"plot 'data.tmp' using 1:2 with points pt 7 ps 0.3, '' using 1:3 with points pt 7 ps 0.3"};
+    char *GnuCommands [] = {"plot 'data.tmp' using 1:2 with points pt 7 ps 0.3"};
 
     fp = fopen("data.tmp", "w");
     gnupipe = popen("gnuplot -persistent", "w");
-    //------------------------------------------------------------------------------------------------------------------
+
     printf("\n");
-    for(i=0; i<SAMPLING_WINDOW_SIZE; i++){
+    for(i=0; i<signal_length; i++){
 
-        fprintf(fp, "%d %f %f\n", i, creal(sinal[i]), creal(saida[i]));
+        fprintf(fp, "%d %f\n", i, creal(sinal[i]));
     }
-    // invocar o gnuplot
-    fprintf(gnupipe, "%s\n", GnuCommands[0]);
+    //fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
     //------------------------------------------------------------------------------------------------------------------
 
-    // desalocar tudo
-    fftw_free(h);
-    fftw_free(sinal);
-    fftw_free(saida);
-
-    fftw_destroy_plan(plano_dft_sinal);
-    fftw_destroy_plan(plano_idft_sinal);
-    fftw_destroy_plan(plano_dft_h);
+    free(sinal);
 
     return 0;
 }

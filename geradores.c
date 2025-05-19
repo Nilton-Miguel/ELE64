@@ -1,10 +1,13 @@
 
 #include "geradores.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <complex.h>
 #include <fftw3.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 /*  --------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +35,9 @@ void resposta_h_amplificador(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, floa
 
     // limpar a regiao de memoria
     int j;
-    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) vetor[j] = 0;
+    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) 
+    
+        vetor[j] = 0;
 
     // atualizar todos os coeficientes nao nulos
     vetor[0] = ganho;
@@ -41,10 +46,31 @@ void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int O
 
     // limpar a regiao de memoria
     int j;
-    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) vetor[j] = 0;
+    for(j=0; j<SAMPLING_WINDOW_SIZE; j++) 
+    
+        vetor[j] = 0;
 
     // atualizar todos os coeficientes nao nulos
     double coeficiente = 1.0f / ORDER;
     vetor[0] = coeficiente;
-    for(j=0; j<ORDER; j++) vetor[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
+    for(j=0; j<ORDER; j++) 
+
+        vetor[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
+}
+void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE){
+
+    double digital_frequency = (ANALOG_FREQUENCY / SAMPLING_RATE) * 2 * M_PI;
+
+    int j;
+    for(j=0; j<LENGTH; j++)
+
+        vetor[j] = AMPLITUDE * cos(digital_frequency*j);
+
+}
+void rebaixar_16bits(fftw_complex *vetor__double_double, short int *vetor_short_int, int LENGTH){
+
+    int j;
+    for(j=0; j<LENGTH; j++)
+
+        vetor_short_int[j] = (short int) creal(vetor__double_double[j]);
 }
