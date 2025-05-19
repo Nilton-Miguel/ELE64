@@ -57,14 +57,14 @@ void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int O
 
         vetor[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
 }
-void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE){
+void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE, float PHASE){
 
     double digital_frequency = (ANALOG_FREQUENCY / SAMPLING_RATE) * 2 * M_PI;
 
     int j;
     for(j=0; j<LENGTH; j++)
 
-        vetor[j] = AMPLITUDE * cos(digital_frequency*j);
+        vetor[j] = AMPLITUDE * cos(digital_frequency*j + PHASE);
 
 }
 void rebaixar_16bits(fftw_complex *vetor__double_double, short int *vetor_short_int, int LENGTH){
@@ -73,4 +73,11 @@ void rebaixar_16bits(fftw_complex *vetor__double_double, short int *vetor_short_
     for(j=0; j<LENGTH; j++)
 
         vetor_short_int[j] = (short int) creal(vetor__double_double[j]);
+}
+void adicionar_ruido(fftw_complex *vetor, int LENGTH, float AMPLITUDE){
+
+    int j;
+    for(j=0; j<LENGTH; j++)
+
+        vetor[j] += AMPLITUDE * (float)rand()/(float)(RAND_MAX);
 }
