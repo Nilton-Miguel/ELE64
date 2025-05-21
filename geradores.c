@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 
 /*  --------------------------------------------------------------------------------------------------------------
 
@@ -57,9 +58,12 @@ void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int O
 
         vetor[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
 }
-void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE, float PHASE){
+void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE){
 
     double digital_frequency = (ANALOG_FREQUENCY / SAMPLING_RATE) * 2 * M_PI;
+
+    srand(time(0));
+    const float PHASE = 60*(float)rand()/(float)(RAND_MAX);
 
     int j;
     for(j=0; j<LENGTH; j++)

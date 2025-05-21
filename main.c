@@ -16,7 +16,7 @@ int i;
 int main(){
 
     int sampling_rate = 48000;
-    int time_length = 2;
+    float time_length = 10;
     int signal_length = time_length * sampling_rate;
 
     fftw_complex *sinal;
@@ -31,22 +31,16 @@ int main(){
     fftw_complex *hard;
     hard = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
-        frequencia_pura(sinal, signal_length, sampling_rate, 440.0, 1000.0, 0.5);
+        frequencia_pura(sinal, signal_length, sampling_rate, 261.0, 1000.0);
         adicionar_ruido(sinal, signal_length, 10.0);
         
-        
-        frequencia_pura(auxiliar, signal_length, sampling_rate, 554.0, 800.0, 4.9);
+        frequencia_pura(auxiliar, signal_length, sampling_rate, 2049.0, 400.0);
         adicionar_ruido(auxiliar, signal_length, 10.0);
         for(i=0; i<signal_length; i++) 
             sinal[i] += auxiliar[i];
 
-        frequencia_pura(auxiliar, signal_length, sampling_rate, 659.0, 900.0, 2.7);
-        adicionar_ruido(auxiliar, signal_length, 10.0);
-        for(i=0; i<signal_length; i++) 
-            sinal[i] += auxiliar[i];
-
-    saturador_soft(sinal, soft, signal_length, 30000.0, 4.0);
-    saturador_hard(sinal, hard, signal_length, 30000.0, 4.0);  
+    saturador_soft(sinal, soft, signal_length, 3000.0, 3.0);
+    saturador_hard(sinal, hard, signal_length, 3000.0, 3.0);  
 
     // audio output -----------------------------------------------------------------------------------------------------
 
@@ -108,7 +102,7 @@ int main(){
         printf("\n");
         for(i=0; i<signal_length; i++){
 
-            fprintf(fp, "%d %f\n", i, creal(sinal[i]));
+            fprintf(fp, "%d %f\n", i, creal(hard_escrita[i]));
         }
         //fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
 

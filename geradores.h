@@ -31,7 +31,7 @@ void resposta_h_amplificador(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, floa
 
 void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int ORDER);
 
-void frequencia_pura(fftw_complex *vector, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE, float PHASE);
+void frequencia_pura(fftw_complex *vector, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE);
 
 void rebaixar_16bits(fftw_complex *vetor__double_double, short int *vetor_short_int, int LENGTH);
 
