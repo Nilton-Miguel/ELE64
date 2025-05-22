@@ -4,26 +4,32 @@
 
 #include <complex.h>
 #include <fftw3.h>
+#include <sndfile.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <limits.h>
 
 #define SAMPLING_WINDOW_SIZE 1024
-int i;
+long int i;
 
 int main(){
 
-    int sampling_rate = 48000;
-    float time_length = 10;
-    int signal_length = time_length * sampling_rate;
+        // abrir o arquivo de auido e obter seus dados
+        SF_INFO info_wav_entrada;
+        info_wav_entrada.format = 0;
+        SNDFILE * wav_entrada = sf_open("audio_snippet_2.wav", SFM_READ, &info_wav_entrada) ;
+
+        // sampling rate agora vem do arquivo de audio
+        long int sampling_rate = info_wav_entrada.samplerate;
+
+    float time_length = 2.5;
+    long int signal_length = time_length * sampling_rate;
 
     fftw_complex *sinal;
     sinal = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
-
-    fftw_complex *auxiliar;
-    auxiliar = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
     fftw_complex *soft;
     soft = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
@@ -31,16 +37,28 @@ int main(){
     fftw_complex *hard;
     hard = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
-        frequencia_pura(sinal, signal_length, sampling_rate, 261.0, 1000.0);
-        adicionar_ruido(sinal, signal_length, 10.0);
-        
-        frequencia_pura(auxiliar, signal_length, sampling_rate, 2049.0, 400.0);
-        adicionar_ruido(auxiliar, signal_length, 10.0);
-        for(i=0; i<signal_length; i++) 
-            sinal[i] += auxiliar[i];
+        // um buffer de floats
+        long int BUFFER_SIZE = signal_length * info_wav_entrada.channels;
+        float buffer[BUFFER_SIZE];
+        sf_count_t FRAMES = signal_length;
 
-    saturador_soft(sinal, soft, signal_length, 3000.0, 3.0);
-    saturador_hard(sinal, hard, signal_length, 3000.0, 3.0);  
+        //printf("%ld", BUFFER_SIZE);
+
+        sf_readf_float (wav_entrada, buffer, FRAMES);
+
+        for (i = 0; i < BUFFER_SIZE/2; i++)
+        {   
+            sinal[i] = SHRT_MAX * buffer[info_wav_entrada.channels*i];
+            //printf("%f\n", creal(sinal[i]));
+        }
+
+        sf_close  (wav_entrada);
+
+    double SATURATION_WINDOW = 1 * SHRT_MAX;
+    double SATURATION_GAIN   = 0.1;
+
+    saturador_soft(sinal, soft, signal_length, SATURATION_WINDOW, SATURATION_GAIN);
+    saturador_hard(sinal, hard, signal_length, SATURATION_WINDOW, SATURATION_GAIN);  
 
     // audio output -----------------------------------------------------------------------------------------------------
 
@@ -102,7 +120,7 @@ int main(){
         printf("\n");
         for(i=0; i<signal_length; i++){
 
-            fprintf(fp, "%d %f\n", i, creal(hard_escrita[i]));
+            fprintf(fp, "%ld %f\n", i, creal(hard_escrita[i]));
         }
         //fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
 
@@ -112,10 +130,9 @@ int main(){
     //------------------------------------------------------------------------------------------------------------------
 
     fftw_free(sinal);
-    fftw_free(auxiliar);
     fftw_free(soft);
     fftw_free(hard);
-
+    
     free(sinal_escrita);
     free(soft_escrita);
     free(hard_escrita);

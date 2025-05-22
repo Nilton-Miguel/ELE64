@@ -37,4 +37,19 @@ lfilter](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lfilt
 
 [Filtro digital](https://en-m-wikipedia-org.translate.goog/wiki/Digital_filter?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc)
 
+[Linear phase](https://en.wikipedia.org/wiki/Linear_phase)
+
+[The Scientist and Engineer's Guide to
+Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
+
+[libsndfile](http://www.mega-nerd.com/libsndfile/api.html)
+
+[Find any sound you like](https://freesound.org/)
+
+[min and max value of data type in C](https://stackoverflow.com/questions/2053843/min-and-max-value-of-data-type-in-c)
+
+[Sound file I/O in Extempore with libsndfile](https://benswift.me/blog/2019/10/15/sound-file-io-in-extempore-with-libsndfile/)
+
+[]()
+
 []()
