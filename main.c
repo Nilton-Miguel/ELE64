@@ -21,12 +21,12 @@ int main(){
     
     SF_INFO info_wav_entrada;
     info_wav_entrada.format = 0;
-    SNDFILE * wav_entrada = sf_open("audio_snippet_2.wav", SFM_READ, &info_wav_entrada) ;
+    SNDFILE * wav_entrada = sf_open("audio_snippet_5.wav", SFM_READ, &info_wav_entrada) ;
 
     // sampling rate agora vem do arquivo de audio
     long int sampling_rate = info_wav_entrada.samplerate;
 
-    float time_length = 5;
+    float time_length = 10;
     long int signal_length = time_length * sampling_rate;
 
     // um buffer de floats
@@ -46,27 +46,25 @@ int main(){
         //printf("%f\n", creal(sinal[i]));
     }
 
+    //frequencia_pura(sinal, signal_length, sampling_rate, 1672.0, 10000);
+
     sf_close  (wav_entrada);
 
     //------------------------------------------------------------------------------------------------------------------
 
     // teste dos efeitos
 
-    long int DURATION = 0.1 * sampling_rate;
-    float DECAY = 0.25;
+    fftw_complex *lowpass;
+    lowpass =    (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
-    double JANELA = 0.4*SHRT_MAX;
-    float GANHO = 1.0;
-
-    fftw_complex *reverb;
-    reverb =    (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
-
+    /*
     fftw_complex *residual;
     residual =  (fftw_complex*) fftw_malloc(DURATION * sizeof(fftw_complex));
     for(i=0; i<DURATION; i++) residual[i] = 0;
+    */
 
-    saturador_soft(sinal, reverb, signal_length, JANELA, GANHO);
-    delay(reverb, reverb, residual, signal_length, DURATION, DECAY);
+    float CUTOFF = 100;
+    passive_lowpass(sinal, lowpass, sampling_rate, signal_length, CUTOFF);
 
     // audio output ----------------------------------------------------------------------------------------------------
 
@@ -74,9 +72,9 @@ int main(){
         sinal_escrita = (short int *) malloc(signal_length * sizeof(short int));
         rebaixar_16bits(sinal, sinal_escrita, signal_length);
 
-        short int *reverb_escrita;
-        reverb_escrita = (short int *) malloc(signal_length * sizeof(short int));
-        rebaixar_16bits(reverb, reverb_escrita, signal_length);
+        short int *lowpass_escrita;
+        lowpass_escrita = (short int *) malloc(signal_length * sizeof(short int));
+        rebaixar_16bits(lowpass, lowpass_escrita, signal_length);
 
         wav_header wav_file_header;
 
@@ -102,9 +100,9 @@ int main(){
         fwrite(sinal_escrita, 8, signal_length, wav_file_pointer);
         fclose(wav_file_pointer);
 
-        wav_file_pointer = fopen("reverb.wav", "w");
+        wav_file_pointer = fopen("lowpass.wav", "w");
         fwrite(&wav_file_header, 1, sizeof(wav_file_header), wav_file_pointer);
-        fwrite(reverb_escrita, 8, signal_length, wav_file_pointer);
+        fwrite(lowpass_escrita, 8, signal_length, wav_file_pointer);
         fclose(wav_file_pointer);
 
     // plotagem --------------------------------------------------------------------------------------------------------
@@ -131,10 +129,10 @@ int main(){
     //------------------------------------------------------------------------------------------------------------------
 
     fftw_free(sinal);
-    fftw_free(reverb);
-    fftw_free(residual);
+    fftw_free(lowpass);
+    //fftw_free(residual);
 
     free(sinal_escrita);
-    free(reverb_escrita);
+    free(lowpass_escrita);
     return 0;
 }

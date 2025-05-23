@@ -38,15 +38,26 @@ void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, in
         residual[mod_j] = output[j];
     }
 }
+void passive_lowpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
+{
+    fftw_complex residual = 0;
+
+    float ANALOG_ANGULAR_FREQUENCY = 2 * M_PI * ANALOG_FREQUENCY;
+    float ANTI_INERCIA = ANALOG_ANGULAR_FREQUENCY / (sampling_rate + ANALOG_ANGULAR_FREQUENCY);
+    float INERCIA = 1 - ANTI_INERCIA;
+
+    int j;
+    for(j=0; j<LENGTH; j++)
+    {
+        output[j] = ANTI_INERCIA * sinal[j] + INERCIA * residual;
+        residual = output[j];
+    }
+}
 void notch()
 {
 
 }
 void chorus()
-{
-
-}
-void lowpass()
 {
 
 }

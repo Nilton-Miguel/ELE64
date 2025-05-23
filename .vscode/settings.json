@@ -1,6 +1,7 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "geradores.h": "c"
+        "geradores.h": "c",
+        "complex.h": "c"
     }
 }

@@ -16,4 +16,6 @@ void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, doubl
 
 void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, int LENGTH, long int DURATION, float DECAY);
 
+void passive_lowpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+
 #endif

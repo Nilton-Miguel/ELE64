@@ -54,7 +54,7 @@ Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
 
 [Ultimate Guide to Audio Effects](https://www.izotope.com/en/learn/guide-to-audio-effects.html)
 
-[]()
+[Low-pass filter](https://en.wikipedia.org/wiki/Low-pass_filter#math_I)
 
 []()
 
