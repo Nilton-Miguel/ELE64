@@ -50,6 +50,12 @@ Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
 
 [Sound file I/O in Extempore with libsndfile](https://benswift.me/blog/2019/10/15/sound-file-io-in-extempore-with-libsndfile/)
 
+[Diferença entre delay, reverb e chorus](https://www.salaomusical.com/pt/blog-instrumentos-musicais/464_qual-e-a-diferenca-entre-delay-reverb-e-chorus.html)
+
+[Ultimate Guide to Audio Effects](https://www.izotope.com/en/learn/guide-to-audio-effects.html)
+
+[]()
+
 []()
 
 []()

@@ -8,8 +8,8 @@
 #include <string.h>
 #include <math.h>
 
-void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO){
-
+void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO)
+{
     float ganho_argumento = GANHO / JANELA ;
 
     int j;
@@ -17,8 +17,8 @@ void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, doubl
 
         output[j] = JANELA * tanh(ganho_argumento*sinal[j]);
 }
-void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO){
-
+void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO)
+{
     float offset_argumento  = JANELA / GANHO ;
     float ganho_saida       = GANHO / 2 ;
 
@@ -26,4 +26,43 @@ void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, doubl
     for(j=0; j<LENGTH; j++)
 
         output[j] = ganho_saida * (abs( sinal[j] + offset_argumento ) - abs( sinal[j] - offset_argumento ));
+}
+void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, int LENGTH, long int DURATION, float DECAY)
+{
+    int j;
+    for(j=0; j<LENGTH; j++)
+    {
+        int mod_j = (DURATION + j) % DURATION;
+
+        output[j] = sinal[j] + DECAY * residual[mod_j];
+        residual[mod_j] = output[j];
+    }
+}
+void notch()
+{
+
+}
+void chorus()
+{
+
+}
+void lowpass()
+{
+
+}
+void highpass()
+{
+
+}
+void bandpass()
+{
+
+}
+void bandreject()
+{
+
+}
+void reverb()
+{
+    
 }

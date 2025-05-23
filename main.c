@@ -12,67 +12,71 @@
 #include <math.h>
 #include <limits.h>
 
-#define SAMPLING_WINDOW_SIZE 1024
+#define PROCESSING_WINDOW 1024
 long int i;
 
 int main(){
 
-        // abrir o arquivo de auido e obter seus dados
-        SF_INFO info_wav_entrada;
-        info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippet_2.wav", SFM_READ, &info_wav_entrada) ;
+    // abrir o arquivo de auido e obter seus dados ---------------------------------------------------------------------
+    
+    SF_INFO info_wav_entrada;
+    info_wav_entrada.format = 0;
+    SNDFILE * wav_entrada = sf_open("audio_snippet_2.wav", SFM_READ, &info_wav_entrada) ;
 
-        // sampling rate agora vem do arquivo de audio
-        long int sampling_rate = info_wav_entrada.samplerate;
+    // sampling rate agora vem do arquivo de audio
+    long int sampling_rate = info_wav_entrada.samplerate;
 
-    float time_length = 2.5;
+    float time_length = 5;
     long int signal_length = time_length * sampling_rate;
 
+    // um buffer de floats
+    long int BUFFER_SIZE = signal_length * info_wav_entrada.channels;
+    float buffer[BUFFER_SIZE];
+    sf_count_t FRAMES = signal_length;
+
+    sf_readf_float (wav_entrada, buffer, FRAMES);
+
+    // reservar memoria para o sinal a ser processado
     fftw_complex *sinal;
     sinal = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
-    fftw_complex *soft;
-    soft = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
+    for (i = 0; i < BUFFER_SIZE/2; i++)
+    {   
+        sinal[i] = SHRT_MAX * buffer[info_wav_entrada.channels*i];
+        //printf("%f\n", creal(sinal[i]));
+    }
 
-    fftw_complex *hard;
-    hard = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
+    sf_close  (wav_entrada);
 
-        // um buffer de floats
-        long int BUFFER_SIZE = signal_length * info_wav_entrada.channels;
-        float buffer[BUFFER_SIZE];
-        sf_count_t FRAMES = signal_length;
+    //------------------------------------------------------------------------------------------------------------------
 
-        //printf("%ld", BUFFER_SIZE);
+    // teste dos efeitos
 
-        sf_readf_float (wav_entrada, buffer, FRAMES);
+    long int DURATION = 0.1 * sampling_rate;
+    float DECAY = 0.25;
 
-        for (i = 0; i < BUFFER_SIZE/2; i++)
-        {   
-            sinal[i] = SHRT_MAX * buffer[info_wav_entrada.channels*i];
-            //printf("%f\n", creal(sinal[i]));
-        }
+    double JANELA = 0.4*SHRT_MAX;
+    float GANHO = 1.0;
 
-        sf_close  (wav_entrada);
+    fftw_complex *reverb;
+    reverb =    (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
-    double SATURATION_WINDOW = 1 * SHRT_MAX;
-    double SATURATION_GAIN   = 0.1;
+    fftw_complex *residual;
+    residual =  (fftw_complex*) fftw_malloc(DURATION * sizeof(fftw_complex));
+    for(i=0; i<DURATION; i++) residual[i] = 0;
 
-    saturador_soft(sinal, soft, signal_length, SATURATION_WINDOW, SATURATION_GAIN);
-    saturador_hard(sinal, hard, signal_length, SATURATION_WINDOW, SATURATION_GAIN);  
+    saturador_soft(sinal, reverb, signal_length, JANELA, GANHO);
+    delay(reverb, reverb, residual, signal_length, DURATION, DECAY);
 
-    // audio output -----------------------------------------------------------------------------------------------------
+    // audio output ----------------------------------------------------------------------------------------------------
 
         short int *sinal_escrita;
         sinal_escrita = (short int *) malloc(signal_length * sizeof(short int));
         rebaixar_16bits(sinal, sinal_escrita, signal_length);
 
-        short int *soft_escrita;
-        soft_escrita = (short int *) malloc(signal_length * sizeof(short int));
-        rebaixar_16bits(soft, soft_escrita, signal_length);
-
-        short int *hard_escrita;
-        hard_escrita = (short int *) malloc(signal_length * sizeof(short int));
-        rebaixar_16bits(hard, hard_escrita, signal_length);
+        short int *reverb_escrita;
+        reverb_escrita = (short int *) malloc(signal_length * sizeof(short int));
+        rebaixar_16bits(reverb, reverb_escrita, signal_length);
 
         wav_header wav_file_header;
 
@@ -98,18 +102,14 @@ int main(){
         fwrite(sinal_escrita, 8, signal_length, wav_file_pointer);
         fclose(wav_file_pointer);
 
-        wav_file_pointer = fopen("soft.wav", "w");
+        wav_file_pointer = fopen("reverb.wav", "w");
         fwrite(&wav_file_header, 1, sizeof(wav_file_header), wav_file_pointer);
-        fwrite(soft_escrita, 8, signal_length, wav_file_pointer);
-        fclose(wav_file_pointer);
-
-        wav_file_pointer = fopen("hard.wav", "w");
-        fwrite(&wav_file_header, 1, sizeof(wav_file_header), wav_file_pointer);
-        fwrite(hard_escrita, 8, signal_length, wav_file_pointer);
+        fwrite(reverb_escrita, 8, signal_length, wav_file_pointer);
         fclose(wav_file_pointer);
 
     // plotagem --------------------------------------------------------------------------------------------------------
 
+        /*
         FILE *fp = NULL;
         FILE *gnupipe = NULL;
         char *GnuCommands [] = {"plot 'data.tmp' using 1:2 with points pt 7 ps 0.3"};
@@ -122,19 +122,19 @@ int main(){
 
             fprintf(fp, "%ld %f\n", i, creal(hard_escrita[i]));
         }
-        //fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
+        fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
 
         fclose(fp);
         fclose(gnupipe);
+        */
 
     //------------------------------------------------------------------------------------------------------------------
 
     fftw_free(sinal);
-    fftw_free(soft);
-    fftw_free(hard);
-    
+    fftw_free(reverb);
+    fftw_free(residual);
+
     free(sinal_escrita);
-    free(soft_escrita);
-    free(hard_escrita);
+    free(reverb_escrita);
     return 0;
 }

@@ -14,4 +14,6 @@ void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, doubl
 
 void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO);
 
+void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, int LENGTH, long int DURATION, float DECAY);
+
 #endif
