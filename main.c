@@ -21,12 +21,12 @@ int main(){
     
     SF_INFO info_wav_entrada;
     info_wav_entrada.format = 0;
-    SNDFILE * wav_entrada = sf_open("audio_snippet_5.wav", SFM_READ, &info_wav_entrada) ;
+    SNDFILE * wav_entrada = sf_open("audio_snippet_4.wav", SFM_READ, &info_wav_entrada) ;
 
     // sampling rate agora vem do arquivo de audio
     long int sampling_rate = info_wav_entrada.samplerate;
 
-    float time_length = 10;
+    float time_length = 5;
     long int signal_length = time_length * sampling_rate;
 
     // um buffer de floats
@@ -54,8 +54,8 @@ int main(){
 
     // teste dos efeitos
 
-    fftw_complex *lowpass;
-    lowpass =    (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
+    fftw_complex *notch;
+    notch = (fftw_complex*) fftw_malloc(signal_length * sizeof(fftw_complex));
 
     /*
     fftw_complex *residual;
@@ -63,8 +63,22 @@ int main(){
     for(i=0; i<DURATION; i++) residual[i] = 0;
     */
 
-    float CUTOFF = 100;
-    passive_lowpass(sinal, lowpass, sampling_rate, signal_length, CUTOFF);
+    fftw_complex *x_residual;
+    fftw_complex *y_residual;
+
+    x_residual = (fftw_complex*) fftw_malloc(2 * sizeof(fftw_complex));
+    y_residual = (fftw_complex*) fftw_malloc(2 * sizeof(fftw_complex));
+
+    for(i=0; i<2; i++)
+    {
+        x_residual[i] = 0;
+        y_residual[i] = 0;
+    }
+
+    adicionar_ruido(sinal, signal_length, 300);
+
+    float CUTOFF = 4000;
+    passive_lowpass(sinal, notch, sampling_rate, signal_length, CUTOFF);
 
     // audio output ----------------------------------------------------------------------------------------------------
 
@@ -72,9 +86,9 @@ int main(){
         sinal_escrita = (short int *) malloc(signal_length * sizeof(short int));
         rebaixar_16bits(sinal, sinal_escrita, signal_length);
 
-        short int *lowpass_escrita;
-        lowpass_escrita = (short int *) malloc(signal_length * sizeof(short int));
-        rebaixar_16bits(lowpass, lowpass_escrita, signal_length);
+        short int *notch_escrita;
+        notch_escrita = (short int *) malloc(signal_length * sizeof(short int));
+        rebaixar_16bits(notch, notch_escrita, signal_length);
 
         wav_header wav_file_header;
 
@@ -100,9 +114,9 @@ int main(){
         fwrite(sinal_escrita, 8, signal_length, wav_file_pointer);
         fclose(wav_file_pointer);
 
-        wav_file_pointer = fopen("lowpass.wav", "w");
+        wav_file_pointer = fopen("notch.wav", "w");
         fwrite(&wav_file_header, 1, sizeof(wav_file_header), wav_file_pointer);
-        fwrite(lowpass_escrita, 8, signal_length, wav_file_pointer);
+        fwrite(notch_escrita, 8, signal_length, wav_file_pointer);
         fclose(wav_file_pointer);
 
     // plotagem --------------------------------------------------------------------------------------------------------
@@ -110,7 +124,7 @@ int main(){
         /*
         FILE *fp = NULL;
         FILE *gnupipe = NULL;
-        char *GnuCommands [] = {"plot 'data.tmp' using 1:2 with points pt 7 ps 0.3"};
+        char *GnuCommands [] = {"plot 'data.tmp' using 1:2 with points pt 7 ps 0.3, '' using 1:3 with points pt 7 ps 0.3"};
 
         fp      = fopen("data.tmp", "w");
         gnupipe = popen("gnuplot -persistent", "w");
@@ -118,7 +132,7 @@ int main(){
         printf("\n");
         for(i=0; i<signal_length; i++){
 
-            fprintf(fp, "%ld %f\n", i, creal(hard_escrita[i]));
+            fprintf(fp, "%ld %f %d\n", i, creal(sinal_escrita[i]), notch_escrita[i]);
         }
         fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
 
@@ -129,10 +143,11 @@ int main(){
     //------------------------------------------------------------------------------------------------------------------
 
     fftw_free(sinal);
-    fftw_free(lowpass);
-    //fftw_free(residual);
+    fftw_free(notch);
+    fftw_free(x_residual);
+    fftw_free(y_residual);
 
     free(sinal_escrita);
-    free(lowpass_escrita);
+    free(notch_escrita);
     return 0;
 }

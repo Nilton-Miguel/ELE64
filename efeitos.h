@@ -18,4 +18,8 @@ void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, in
 
 void passive_lowpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
 
+void passive_highpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+
+void passive_notch(fftw_complex *sinal, fftw_complex *output, fftw_complex *x_residual, fftw_complex *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS);
+
 #endif

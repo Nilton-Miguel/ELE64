@@ -72,6 +72,19 @@ void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float A
         vetor[j] = AMPLITUDE * cos(digital_frequency*j + PHASE);
 
 }
+void adicionar_frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE)
+{
+    double digital_frequency = (ANALOG_FREQUENCY / SAMPLING_RATE) * 2 * M_PI;
+
+    srand(time(0));
+    const float PHASE = 60*(float)rand()/(float)(RAND_MAX);
+
+    int j;
+    for(j=0; j<LENGTH; j++)
+
+        vetor[j] += AMPLITUDE * cos(digital_frequency*j + PHASE);
+
+}
 void rebaixar_16bits(fftw_complex *vetor__double_double, short int *vetor_short_int, int LENGTH)
 {
     int j;
