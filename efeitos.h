@@ -10,16 +10,16 @@
 #include <string.h>
 #include <math.h>
 
-void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO);
+void saturador_soft(float *sinal, float *output, int LENGTH, double JANELA, float GANHO);
 
-void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO);
+void saturador_hard(float *sinal, float *output, int LENGTH, double JANELA, float GANHO);
 
-void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, int LENGTH, long int DURATION, float DECAY);
+void echo(float *sinal, float *output, float *residual, int LENGTH, long int DURATION, float DECAY);
 
-void passive_lowpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+void lowpass(float *sinal, float *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
 
-void passive_highpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+void highpass(float *sinal, float *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
 
-void passive_notch(fftw_complex *sinal, fftw_complex *output, fftw_complex *x_residual, fftw_complex *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS);
+void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS);
 
 #endif

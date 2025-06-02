@@ -2,13 +2,13 @@
 #include "geradores.h"
 
 #include <complex.h>
-#include <fftw3.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <limits.h>
 
 /*  --------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
     scalabily if the size of the processing window were altered. 
     -------------------------------------------------------------------------------------------------------------- */
 
-void resposta_h_amplificador(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, float ganho)
+void resposta_h_amplificador(float *vetor, int SAMPLING_WINDOW_SIZE, float ganho)
 {
 
     // limpar a regiao de memoria
@@ -44,7 +44,7 @@ void resposta_h_amplificador(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, floa
     // atualizar todos os coeficientes nao nulos
     vetor[0] = ganho;
 }
-void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int ORDER)
+void resposta_h_media_movel(float *vetor, int SAMPLING_WINDOW_SIZE, int ORDER)
 {
     // limpar a regiao de memoria
     int j;
@@ -59,7 +59,7 @@ void resposta_h_media_movel(fftw_complex *vetor, int SAMPLING_WINDOW_SIZE, int O
 
         vetor[SAMPLING_WINDOW_SIZE -1 -j] = coeficiente;
 }
-void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE)
+void frequencia_pura(float *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE)
 {
     double digital_frequency = (ANALOG_FREQUENCY / SAMPLING_RATE) * 2 * M_PI;
 
@@ -72,7 +72,7 @@ void frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float A
         vetor[j] = AMPLITUDE * cos(digital_frequency*j + PHASE);
 
 }
-void adicionar_frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE)
+void adicionar_frequencia_pura(float *vetor, int LENGTH, int SAMPLING_RATE, float ANALOG_FREQUENCY, float AMPLITUDE)
 {
     double digital_frequency = (ANALOG_FREQUENCY / SAMPLING_RATE) * 2 * M_PI;
 
@@ -85,14 +85,7 @@ void adicionar_frequencia_pura(fftw_complex *vetor, int LENGTH, int SAMPLING_RAT
         vetor[j] += AMPLITUDE * cos(digital_frequency*j + PHASE);
 
 }
-void rebaixar_16bits(fftw_complex *vetor__double_double, short int *vetor_short_int, int LENGTH)
-{
-    int j;
-    for(j=0; j<LENGTH; j++)
-
-        vetor_short_int[j] = (short int) creal(vetor__double_double[j]);
-}
-void adicionar_ruido(fftw_complex *vetor, int LENGTH, float AMPLITUDE)
+void adicionar_ruido(float *vetor, int LENGTH, float AMPLITUDE)
 {
     int j;
     for(j=0; j<LENGTH; j++)

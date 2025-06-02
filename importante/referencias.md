@@ -56,6 +56,14 @@ Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
 
 [Low-pass filter](https://en.wikipedia.org/wiki/Low-pass_filter#math_I)
 
-[]()
+[Single-precision floating-point format](https://en.wikipedia.org/wiki/Single-precision_floating-point_format)
 
-[]()
+[C data types](https://en.wikipedia.org/wiki/C_data_types)
+
+[Limites flutuantes](https://learn.microsoft.com/pt-br/cpp/cpp/floating-limits?view=msvc-170)
+
+[Limites de inteiro](https://learn.microsoft.com/pt-br/cpp/cpp/integer-limits?view=msvc-170)
+
+[WAV](https://en.wikipedia.org/wiki/WAV)
+
+["Let's Write A Reverb" || Geraint Luff](https://www.youtube.com/watch?v=QWnD30xHjW4)

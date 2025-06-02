@@ -1,14 +1,11 @@
 #include "efeitos.h"
 
-#include <complex.h>
-#include <fftw3.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO)
+void saturador_soft(float *sinal, float *output, int LENGTH, double JANELA, float GANHO)
 {
     float ganho_argumento = GANHO / JANELA ;
 
@@ -17,7 +14,7 @@ void saturador_soft(fftw_complex *sinal, fftw_complex *output, int LENGTH, doubl
 
         output[j] = JANELA * tanh(ganho_argumento*sinal[j]);
 }
-void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, double JANELA, float GANHO)
+void saturador_hard(float *sinal, float *output, int LENGTH, double JANELA, float GANHO)
 {
     float offset_argumento  = JANELA / GANHO ;
     float ganho_saida       = GANHO / 2 ;
@@ -27,7 +24,7 @@ void saturador_hard(fftw_complex *sinal, fftw_complex *output, int LENGTH, doubl
 
         output[j] = ganho_saida * (abs( sinal[j] + offset_argumento ) - abs( sinal[j] - offset_argumento ));
 }
-void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, int LENGTH, long int DURATION, float DECAY)
+void echo(float *sinal, float *output, float *residual, int LENGTH, long int DURATION, float DECAY)
 {
     long int j;
     for(j=0; j<LENGTH; j++)
@@ -38,9 +35,9 @@ void delay(fftw_complex *sinal, fftw_complex *output, fftw_complex *residual, in
         residual[mod_j] = output[j];
     }
 }
-void passive_lowpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
+void lowpass(float *sinal, float *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
 {
-    fftw_complex residual = 0;
+    float residual = 0;
 
     float ANALOG_ANGULAR_FREQUENCY = 2 * M_PI * ANALOG_FREQUENCY;
     float ANTI_INERCIA = ANALOG_ANGULAR_FREQUENCY / (sampling_rate + ANALOG_ANGULAR_FREQUENCY);
@@ -53,10 +50,10 @@ void passive_lowpass(fftw_complex *sinal, fftw_complex *output, long int samplin
         residual = output[j];
     }
 }
-void passive_highpass(fftw_complex *sinal, fftw_complex *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
+void highpass(float *sinal, float *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
 {
-    fftw_complex x_residual = 0;
-    fftw_complex y_residual = 0;
+    float x_residual = 0;
+    float y_residual = 0;
 
     float FACTOR = sampling_rate / (sampling_rate + 2 * M_PI * ANALOG_FREQUENCY);
 
@@ -68,7 +65,7 @@ void passive_highpass(fftw_complex *sinal, fftw_complex *output, long int sampli
         y_residual = output[j];
     }
 }
-void passive_notch(fftw_complex *sinal, fftw_complex *output, fftw_complex *x_residual, fftw_complex *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS)
+void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS)
 {
     float A = 2 * cos(2*M_PI*(ANALOG_FREQUENCY / sampling_rate));
     float B = (1 + pow(RADIUS, 2)) * cos(2*M_PI*(ANALOG_FREQUENCY / sampling_rate));
@@ -95,16 +92,4 @@ void passive_notch(fftw_complex *sinal, fftw_complex *output, fftw_complex *x_re
         y_residual[antepassado] = output[j];
         //printf("%f %f\n", creal(sinal[j]), creal(output[j]));
     }
-}
-void chorus()
-{
-
-}
-void bandpass()
-{
-
-}
-void reverb()
-{
-    
 }
