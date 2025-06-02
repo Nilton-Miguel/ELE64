@@ -10,15 +10,21 @@
 #include <string.h>
 #include <math.h>
 
-void saturador_soft(float *sinal, float *output, int LENGTH, double JANELA, float GANHO);
+void buffer(float *sinal, float *output, int LENGTH);
 
-void saturador_hard(float *sinal, float *output, int LENGTH, double JANELA, float GANHO);
+void amplificador_soft(float *sinal, float *output, int LENGTH, float GANHO);
 
-void echo(float *sinal, float *output, float *residual, int LENGTH, long int DURATION, float DECAY);
+void amplificador_hard(float *sinal, float *output, int LENGTH, float GANHO);
 
-void lowpass(float *sinal, float *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+void saturador_soft(float *sinal, float *output, int LENGTH, float JANELA, float GANHO);
 
-void highpass(float *sinal, float *output, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+void saturador_hard(float *sinal, float *output, int LENGTH, float JANELA, float GANHO);
+
+void echo(float *sinal, float *output, float *y_residual, int LENGTH, long int DURATION, float DECAY);
+
+void lowpass(float *sinal, float *output, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
+
+void highpass(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY);
 
 void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS);
 

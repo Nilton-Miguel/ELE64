@@ -6,13 +6,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
-#include <limits.h>
-
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
-#define TIME_LENGTH_SECONDS         24
+#define TIME_LENGTH_SECONDS         4
 
 long int i;
 
@@ -23,7 +20,7 @@ int main(){
         // abrir o arquivo de audio e obter metadados
         SF_INFO info_wav_entrada;
         info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_6.wav", SFM_READ, &info_wav_entrada);
+        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_2.wav", SFM_READ, &info_wav_entrada);
 
         printf("\n%ld frames no arquivo\n", info_wav_entrada.frames);
 
@@ -61,17 +58,59 @@ int main(){
     sf_close  (wav_entrada);
     
     // teste dos efeitos -----------------------------------------------------------------------------------------------
-
-        long int DURATION = 0.5 * sampling_rate;
-        float DECAY = 0.3;
-
+    
     // cada canal precisa ser processado separadamente
     float *output_esquerdo;
     output_esquerdo = (float*) malloc(signal_length * sizeof(float));
 
     float *output_direito;
     output_direito = (float*) malloc(signal_length * sizeof(float));
+
+    // parametros do BUFFER ----------------------------------------------------------- ok
+    /*
+    buffer(esquerdo, output_esquerdo, signal_length);
+    buffer(direito, output_direito, signal_length);
+    */
+
+    // parametros do AMPLIFICADOR SOFT ------------------------------------------------ ok
+    /*
+    float GANHO = 7;
+
+    amplificador_soft(esquerdo, output_esquerdo, signal_length, GANHO);
+    amplificador_soft(direito, output_direito, signal_length, GANHO);
+    */
     
+    // parametros do AMPLIFICADOR HARD ------------------------------------------------ ok
+    /*
+    float GANHO = 0.1;
+
+    amplificador(esquerdo, output_esquerdo, signal_length, GANHO);
+    amplificador(direito, output_direito, signal_length, GANHO);
+    */
+
+    // parametros do SATURADOR SOFT --------------------------------------------------- ok
+    /*
+    float JANELA = 0.6;
+    float GANHO = 6;
+
+    saturador_soft(esquerdo, output_esquerdo, signal_length, JANELA, GANHO);
+    saturador_soft(direito, output_direito, signal_length, JANELA, GANHO);
+    */
+
+    // parametros do SATURADOR HARD --------------------------------------------------- ok
+    /*
+    float JANELA = 1;
+    float GANHO = 3;
+
+    saturador_hard(esquerdo, output_esquerdo, signal_length, JANELA, GANHO);
+    saturador_hard(direito, output_direito, signal_length, JANELA, GANHO);
+    */
+
+    // parametros do ECHO ------------------------------------------------------------- ok
+    /*
+    long int DURATION = 0.5 * sampling_rate;
+    float DECAY = 0.3;
+
     float *residual_esquerdo;
     residual_esquerdo = (float*) malloc(DURATION * sizeof(float));
 
@@ -86,7 +125,40 @@ int main(){
 
     echo(esquerdo, output_esquerdo, residual_esquerdo, signal_length, DURATION, DECAY);
     echo(direito, output_direito, residual_direito, signal_length, DURATION, DECAY);
-    
+    */
+
+    // parametros do LOWPASS ---------------------------------------------------------- ok
+    /*
+    float CUTOFF = 100;
+
+    float lowpass_residual_esquerdo = 0;
+    float lowpass_residual_direito = 0;
+
+    printf("residual antes: %f %f\n", lowpass_residual_esquerdo, lowpass_residual_direito);
+
+    lowpass(esquerdo, output_esquerdo, &lowpass_residual_esquerdo, sampling_rate, signal_length, CUTOFF);
+    lowpass(direito, output_direito, &lowpass_residual_direito, sampling_rate, signal_length, CUTOFF);
+
+    printf("residual depois: %f %f\n", lowpass_residual_esquerdo, lowpass_residual_direito);
+    */
+
+    // parametros do HIGHPASS --------------------------------------------------------- ok
+    /*
+    float CUTOFF = 1000;
+
+    float highpass_x_residual_esquerdo, highpass_y_residual_esquerdo    = 0;
+    float highpass_x_residual_direito,  highpass_y_residual_direito     = 0;
+
+    printf("x antes: %f %f y antes: %f %f\n", 
+        highpass_x_residual_esquerdo, highpass_x_residual_direito, highpass_y_residual_esquerdo, highpass_y_residual_direito);
+
+    highpass(esquerdo, output_esquerdo, &highpass_x_residual_esquerdo, &highpass_y_residual_esquerdo, sampling_rate, signal_length, CUTOFF);
+    highpass(direito, output_direito, &highpass_x_residual_direito, &highpass_y_residual_direito, sampling_rate, signal_length, CUTOFF);
+
+    printf("x depois: %f %f y depois: %f %f\n", 
+        highpass_x_residual_esquerdo, highpass_x_residual_direito, highpass_y_residual_esquerdo, highpass_y_residual_direito);
+    */
+
     // audio output ----------------------------------------------------------------------------------------------------
 
         // gerar as structs de info dos arquivos
@@ -145,14 +217,14 @@ int main(){
         printf("\n");
         for(i=0; i<signal_length; i++){
 
-            fprintf(fp, "%ld %f %f\n", i, buffer[i], input_stereo[i]);
+            fprintf(fp, "%ld %f %f\n", i, esquerdo[i], output_esquerdo[i]);
         }
         fprintf(gnupipe, "%s\n", GnuCommands[0]); // invocar o gnuplot
 
         fclose(fp);
         fclose(gnupipe);
         */
-               
+        
     //------------------------------------------------------------------------------------------------------------------
 
     free(in_buffer);
@@ -163,10 +235,11 @@ int main(){
     free(output_esquerdo);
     free(output_direito);
 
-    free(residual_esquerdo);
-    free(residual_direito);
+    //free(residual_esquerdo);
+    //free(residual_direito);
 
     free(input_stereo);
+    free(output_stereo);
 
     return 0;
 }
