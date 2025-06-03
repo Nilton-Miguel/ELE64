@@ -67,26 +67,30 @@ void saturador_hard(float *sinal, float *output, int LENGTH, float JANELA, float
         else if (output[j] <= -JANELA)  output[j] = -JANELA;
     }
 }
-void echo(float *sinal, float *output, float *y_residual, int LENGTH, long int DURATION, float DECAY)
+void echo(float *sinal, float *output, float *y_residual, int LENGTH, long int DURATION, float DECAY, float WET)
 {
     // memoria residual
     // x : 0
     // y : DURATION
+
+    float DRY = 1 - WET;
 
     long int j;
     for(j=0; j<LENGTH; j++)
     {
         int mod_j = (DURATION + j) % DURATION;
 
-        output[j] = sinal[j] + DECAY * y_residual[mod_j];
+        output[j] = WET*(sinal[j] + DECAY * y_residual[mod_j]) + DRY*(sinal[j]);
         y_residual[mod_j] = output[j];
     }
 }
-void lowpass(float *sinal, float *output, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
+void lowpass(float *sinal, float *output, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET)
 {
     // memoria residual
     // x : 0
     // y : 1
+
+    float DRY = 1 - WET;
 
     float ANALOG_ANGULAR_FREQUENCY = 2 * M_PI * ANALOG_FREQUENCY;
     float ANTI_INERCIA = ANALOG_ANGULAR_FREQUENCY / (sampling_rate + ANALOG_ANGULAR_FREQUENCY);
@@ -95,39 +99,43 @@ void lowpass(float *sinal, float *output, float *y_residual, long int sampling_r
     long int j;
     for(j=0; j<LENGTH; j++)
     {
-        output[j] = ANTI_INERCIA * sinal[j] + INERCIA * y_residual[0];
+        output[j] = WET*(ANTI_INERCIA * sinal[j] + INERCIA * y_residual[0]) + DRY*(sinal[j]);
         y_residual[0] = output[j];
     }
 }
-void highpass(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY)
+void highpass(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET)
 {
     // memoria residual
     // x : 1
     // y : 1
+
+    float DRY = 1 - WET;
 
     float FACTOR = sampling_rate / (sampling_rate + 2 * M_PI * ANALOG_FREQUENCY);
 
     long int j;
     for(j=0; j<LENGTH; j++)
     {
-        output[j] = FACTOR * ( sinal[j] - x_residual[0] + y_residual[0]);
+        output[j] = WET*(FACTOR * ( sinal[j] - x_residual[0] + y_residual[0])) + DRY*(sinal[j]);
         x_residual[0] = sinal[j];
         y_residual[0] = output[j];
     }
 }
-void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float RADIUS)
+void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET)
 {
     // memoria residual
     // x : 2
     // y : 2
+
+    float DRY = 1 - WET;
+
+    float RADIUS = 0.95;
 
     float A = 2 * cos(2*M_PI*(ANALOG_FREQUENCY / sampling_rate));
     float B = (1 + pow(RADIUS, 2)) * cos(2*M_PI*(ANALOG_FREQUENCY / sampling_rate));
     float C = pow(RADIUS, 2);
 
     float NORMA = (1 - B + C) / (2 - A);
-
-    //printf("%f %f %f %f\n", A, B, C, NORMA);
 
     int passado;
     int antepassado;
@@ -138,13 +146,9 @@ void notch(float *sinal, float *output, float *x_residual, float *y_residual, lo
         passado     = (2 + j) % 2;
         antepassado = (3 + j) % 2;
 
-        //printf("%f %f %f %f\n", creal(x_residual[passado]), creal(x_residual[antepassado]), creal(y_residual[passado]), creal(y_residual[antepassado]));
-
-        output[j] = NORMA*(sinal[j] - A*x_residual[passado] + x_residual[antepassado]) +B*y_residual[passado] - C*y_residual[antepassado];
+        output[j] = WET*(NORMA*(sinal[j] - A*x_residual[passado] + x_residual[antepassado]) +B*y_residual[passado] - C*y_residual[antepassado]) + DRY*(sinal[j]);
 
         x_residual[antepassado] = sinal[j];
         y_residual[antepassado] = output[j];
-        //printf("%f %f\n", creal(sinal[j]), creal(output[j]));
     }
 }
-

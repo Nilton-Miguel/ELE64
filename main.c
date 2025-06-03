@@ -9,7 +9,7 @@
 #include <math.h>
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
-#define TIME_LENGTH_SECONDS         4
+#define TIME_LENGTH_SECONDS         23
 
 long int i;
 
@@ -20,7 +20,7 @@ int main(){
         // abrir o arquivo de audio e obter metadados
         SF_INFO info_wav_entrada;
         info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_2.wav", SFM_READ, &info_wav_entrada);
+        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_6.wav", SFM_READ, &info_wav_entrada);
 
         printf("\n%ld frames no arquivo\n", info_wav_entrada.frames);
 
@@ -66,13 +66,15 @@ int main(){
     float *output_direito;
     output_direito = (float*) malloc(signal_length * sizeof(float));
 
-    // parametros do BUFFER ----------------------------------------------------------- ok
+    float WET = 1;
+
+    // parametros do BUFFER ----------------------------------------------------------- ok ok
     /*
     buffer(esquerdo, output_esquerdo, signal_length);
     buffer(direito, output_direito, signal_length);
     */
 
-    // parametros do AMPLIFICADOR SOFT ------------------------------------------------ ok
+    // parametros do AMPLIFICADOR SOFT ------------------------------------------------ ok ok
     /*
     float GANHO = 7;
 
@@ -80,7 +82,7 @@ int main(){
     amplificador_soft(direito, output_direito, signal_length, GANHO);
     */
     
-    // parametros do AMPLIFICADOR HARD ------------------------------------------------ ok
+    // parametros do AMPLIFICADOR HARD ------------------------------------------------ ok ok
     /*
     float GANHO = 0.1;
 
@@ -88,7 +90,7 @@ int main(){
     amplificador(direito, output_direito, signal_length, GANHO);
     */
 
-    // parametros do SATURADOR SOFT --------------------------------------------------- ok
+    // parametros do SATURADOR SOFT --------------------------------------------------- ok ok
     /*
     float JANELA = 0.6;
     float GANHO = 6;
@@ -97,7 +99,7 @@ int main(){
     saturador_soft(direito, output_direito, signal_length, JANELA, GANHO);
     */
 
-    // parametros do SATURADOR HARD --------------------------------------------------- ok
+    // parametros do SATURADOR HARD --------------------------------------------------- ok ok
     /*
     float JANELA = 1;
     float GANHO = 3;
@@ -106,7 +108,7 @@ int main(){
     saturador_hard(direito, output_direito, signal_length, JANELA, GANHO);
     */
 
-    // parametros do ECHO ------------------------------------------------------------- ok
+    // parametros do ECHO ------------------------------------------------------------- ok ok
     /*
     long int DURATION = 0.5 * sampling_rate;
     float DECAY = 0.3;
@@ -123,28 +125,28 @@ int main(){
         residual_direito[i] = 0;
     }
 
-    echo(esquerdo, output_esquerdo, residual_esquerdo, signal_length, DURATION, DECAY);
-    echo(direito, output_direito, residual_direito, signal_length, DURATION, DECAY);
+    echo(esquerdo, output_esquerdo, residual_esquerdo, signal_length, DURATION, DECAY, WET);
+    echo(direito, output_direito, residual_direito, signal_length, DURATION, DECAY, WET);
     */
 
-    // parametros do LOWPASS ---------------------------------------------------------- ok
+    // parametros do LOWPASS ---------------------------------------------------------- ok ok
     /*
-    float CUTOFF = 100;
+    float CUTOFF = 20;
 
     float lowpass_residual_esquerdo = 0;
     float lowpass_residual_direito = 0;
 
     printf("residual antes: %f %f\n", lowpass_residual_esquerdo, lowpass_residual_direito);
 
-    lowpass(esquerdo, output_esquerdo, &lowpass_residual_esquerdo, sampling_rate, signal_length, CUTOFF);
-    lowpass(direito, output_direito, &lowpass_residual_direito, sampling_rate, signal_length, CUTOFF);
+    lowpass(esquerdo, output_esquerdo, &lowpass_residual_esquerdo, sampling_rate, signal_length, CUTOFF, WET);
+    lowpass(direito, output_direito, &lowpass_residual_direito, sampling_rate, signal_length, CUTOFF, WET);
 
     printf("residual depois: %f %f\n", lowpass_residual_esquerdo, lowpass_residual_direito);
     */
 
-    // parametros do HIGHPASS --------------------------------------------------------- ok
+    // parametros do HIGHPASS --------------------------------------------------------- ok ok
     /*
-    float CUTOFF = 1000;
+    float CUTOFF = 2000;
 
     float highpass_x_residual_esquerdo, highpass_y_residual_esquerdo    = 0;
     float highpass_x_residual_direito,  highpass_y_residual_direito     = 0;
@@ -152,11 +154,36 @@ int main(){
     printf("x antes: %f %f y antes: %f %f\n", 
         highpass_x_residual_esquerdo, highpass_x_residual_direito, highpass_y_residual_esquerdo, highpass_y_residual_direito);
 
-    highpass(esquerdo, output_esquerdo, &highpass_x_residual_esquerdo, &highpass_y_residual_esquerdo, sampling_rate, signal_length, CUTOFF);
-    highpass(direito, output_direito, &highpass_x_residual_direito, &highpass_y_residual_direito, sampling_rate, signal_length, CUTOFF);
+    highpass(esquerdo, output_esquerdo, &highpass_x_residual_esquerdo, &highpass_y_residual_esquerdo, sampling_rate, signal_length, CUTOFF, WET);
+    highpass(direito, output_direito, &highpass_x_residual_direito, &highpass_y_residual_direito, sampling_rate, signal_length, CUTOFF, WET);
 
     printf("x depois: %f %f y depois: %f %f\n", 
         highpass_x_residual_esquerdo, highpass_x_residual_direito, highpass_y_residual_esquerdo, highpass_y_residual_direito);
+    */
+
+    // parametros do NOTCH ------------------------------------------------------------ 
+    /*
+    float CUTOUT = 1000;
+
+    float *x_residual_esquerdo, *y_residual_esquerdo;
+    float *x_residual_direito, *y_residual_direito;
+
+    x_residual_esquerdo =   (float*)malloc(2*sizeof(float));
+    y_residual_esquerdo =   (float*)malloc(2*sizeof(float));
+    x_residual_direito =    (float*)malloc(2*sizeof(float));
+    y_residual_direito =    (float*)malloc(2*sizeof(float));
+
+    for(i=0; i<2; i++) 
+    {
+        y_residual_esquerdo[i] = 0;
+        x_residual_esquerdo[i] = 0;
+
+        x_residual_direito[i] = 0;
+        y_residual_direito[i] = 0;
+    }
+
+    notch(esquerdo, output_esquerdo, x_residual_esquerdo, y_residual_esquerdo, sampling_rate, signal_length, CUTOUT, WET);
+    notch(direito,  output_direito,  x_residual_esquerdo, y_residual_esquerdo, sampling_rate, signal_length, CUTOUT, WET);
     */
 
     // audio output ----------------------------------------------------------------------------------------------------
