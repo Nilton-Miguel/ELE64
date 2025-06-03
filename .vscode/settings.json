@@ -5,6 +5,7 @@
         "complex.h": "c",
         "fftw3.h": "c",
         "stdlib.h": "c",
-        "interface.h": "c"
+        "interface.h": "c",
+        "stdio.h": "c"
     }
 }

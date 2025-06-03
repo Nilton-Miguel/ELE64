@@ -73,3 +73,6 @@ Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
 [What is segmentation fault in c programming?](https://www.reddit.com/r/C_Programming/comments/yqotjn/what_is_segmentation_fault_in_c_programming/)
 
 [Segmentation Fault on Large Array Sizes in C++](https://intellipaat.com/blog/segmentation-fault-on-large-array-sizes-in-cpp/)
+
+[AutoMalloc](https://github.com/milen-patel/auto-malloc)
+
