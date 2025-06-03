@@ -12,8 +12,9 @@ void buffer(float *sinal, float *output, int LENGTH)
     // y : 0
 
     long int j;
-    for(j=0; j<LENGTH; j++) output[j] = sinal[j];
-
+    for(j=0; j<LENGTH; j++) 
+    
+        output[j] = sinal[j];
 }
 void amplificador_soft(float *sinal, float *output, int LENGTH, float GANHO)
 {

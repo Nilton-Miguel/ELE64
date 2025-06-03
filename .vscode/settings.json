@@ -3,6 +3,7 @@
     "files.associations": {
         "geradores.h": "c",
         "complex.h": "c",
-        "fftw3.h": "c"
+        "fftw3.h": "c",
+        "stdlib.h": "c"
     }
 }
