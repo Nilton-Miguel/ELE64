@@ -9,35 +9,18 @@
 #include <math.h>
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
-#define TIME_LENGTH_SECONDS         4
+#define TIME_LENGTH_SECONDS         7
 
 long int i;
 
 int main(){
-
-
-    // leitura dos presets --------------------------------------------------------------------------------------------
-
-    type_effect efeitoA, efeitoB, efeitoC;
-
-    inicializar_efeito(&efeitoA); 
-    inicializar_efeito(&efeitoB); 
-    inicializar_efeito(&efeitoC);
-
-    efeitoA.identificador = HARD_SAT;
-    efeitoA.parametro[0] = 10;
-    efeitoA.parametro[1] = 0.4;
-
-    imprime_efeito(&efeitoA);
-    imprime_efeito(&efeitoB);
-    imprime_efeito(&efeitoC);
 
     // leitura do audio -----------------------------------------------------------------------------------------------
 
         // abrir o arquivo de audio e obter metadados
         SF_INFO info_wav_entrada;
         info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_2.wav", SFM_READ, &info_wav_entrada);
+        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_3.wav", SFM_READ, &info_wav_entrada);
 
         // info temporal
         long int sampling_rate = info_wav_entrada.samplerate;
@@ -77,119 +60,107 @@ int main(){
     float *output_direito;
     output_direito = (float*) malloc(signal_length * sizeof(float));
 
-    float WET = 1;
+    // leitura dos presets ---------------------------------------------------------------------------------------------
 
-    switch (efeitoA.identificador)
-    {
-        case BUFFER:
+        type_effect efeitoA, efeitoB, efeitoC;
 
-            buffer(esquerdo, output_esquerdo, signal_length);
-            buffer(direito,  output_direito,  signal_length);
-            break;
+        inicializar_efeito(&efeitoA); 
+        inicializar_efeito(&efeitoB); 
+        inicializar_efeito(&efeitoC);
 
-        case SOFT_AMP:
+        efeitoA.identificador = LOWPASS;
+        efeitoA.parametro[0] = 1;
+        efeitoA.parametro[1] = 100;
+        efeitoA.parametro[2] = 0.5;
 
-            amplificador_soft(esquerdo, output_esquerdo, signal_length, efeitoA.parametro[0]);
-            amplificador_soft(direito,  output_direito,  signal_length, efeitoA.parametro[0]);
-            break;
+        efeitoB.identificador = BUFFER;
+        efeitoB.parametro[0] = 1;
+        efeitoB.parametro[1] = sampling_rate * 0.5;
+        efeitoB.parametro[2] = 0.3;
 
-        case HARD_AMP:
+        efeitoC.identificador = BUFFER;
+        efeitoC.parametro[0] = 1;
+        efeitoC.parametro[1] = sampling_rate * 0.7;
+        efeitoC.parametro[2] = 0.2;
 
-            amplificador_hard(esquerdo, output_esquerdo, signal_length, efeitoA.parametro[0]);
-            amplificador_hard(direito,  output_direito,  signal_length, efeitoA.parametro[0]);
-            break;
+        imprime_efeito(&efeitoA);
+        imprime_efeito(&efeitoB);
+        imprime_efeito(&efeitoC);
 
-        case SOFT_SAT:
+        alocar_residuais(&efeitoA);
+        alocar_residuais(&efeitoB);
+        alocar_residuais(&efeitoC);
 
-            saturador_soft(esquerdo, output_esquerdo, signal_length, efeitoA.parametro[1], efeitoA.parametro[0]);
-            saturador_soft(direito,  output_direito,  signal_length, efeitoA.parametro[1], efeitoA.parametro[0]);
-            break;
+    // processamento do sinal ------------------------------------------------------------------------------------------
 
-        case HARD_SAT:
-
-            saturador_hard(esquerdo, output_esquerdo, signal_length, efeitoA.parametro[1], efeitoA.parametro[0]);
-            saturador_hard(direito,  output_direito,  signal_length, efeitoA.parametro[1], efeitoA.parametro[0]);
-            break;
-
-        case 0x5:
-
-            break;
-
-        case 0x6:
-
-            break;
-        
-        case 0x7:
-
-            break;
-        
-        case 0x8:
-
-            break;
-        
-        default:
-
-            break;
-    }
+    switch_process(&efeitoA, esquerdo, direito, output_esquerdo, output_direito, signal_length, sampling_rate);
+    switch_process(&efeitoB, output_esquerdo, output_direito, output_esquerdo, output_direito, signal_length, sampling_rate);
+    switch_process(&efeitoC, output_esquerdo, output_direito, output_esquerdo, output_direito, signal_length, sampling_rate);
 
     // audio output ----------------------------------------------------------------------------------------------------
 
-        // gerar as structs de info dos arquivos
+    // gerar as structs de info dos arquivos
 
-            SF_INFO info_wav_input;
-            SF_INFO info_wav_output;
+        SF_INFO info_wav_input;
+        SF_INFO info_wav_output;
 
-            info_wav_input.samplerate = sampling_rate;
-            info_wav_input.channels = 2;
-            info_wav_input.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
+        info_wav_input.samplerate = sampling_rate;
+        info_wav_input.channels = 2;
+        info_wav_input.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
 
-            info_wav_output.samplerate = sampling_rate;
-            info_wav_output.channels = 2;
-            info_wav_output.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
+        info_wav_output.samplerate = sampling_rate;
+        info_wav_output.channels = 2;
+        info_wav_output.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
 
-        // abrir os arquivos em modo de escrita
-        SNDFILE * wav_input =   sf_open("in.wav", SFM_WRITE, &info_wav_input);
-        SNDFILE * wav_output =  sf_open("out.wav", SFM_WRITE, &info_wav_output);
+    // abrir os arquivos em modo de escrita
+    SNDFILE * wav_input =   sf_open("in.wav", SFM_WRITE, &info_wav_input);
+    SNDFILE * wav_output =  sf_open("out.wav", SFM_WRITE, &info_wav_output);
 
-        // escrever os dados e liberar os arquivos
-        
-        float *input_stereo;
-        input_stereo = (float*)malloc(signal_length*info_wav_entrada.channels*sizeof(float));
+    // escrever os dados e liberar os arquivos
+    
+    float *input_stereo;
+    input_stereo = (float*)malloc(signal_length*info_wav_entrada.channels*sizeof(float));
 
-        for(i=0; i<signal_length; i++)
-        {
-            input_stereo[info_wav_entrada.channels*i] =   esquerdo[i];
-            input_stereo[info_wav_entrada.channels*i+1] = direito[i];
-        }
-        
-        float *output_stereo;
-        output_stereo = (float*)malloc(signal_length*info_wav_entrada.channels*sizeof(float));
+    for(i=0; i<signal_length; i++)
+    {
+        input_stereo[info_wav_entrada.channels*i] =   esquerdo[i];
+        input_stereo[info_wav_entrada.channels*i+1] = direito[i];
+    }
+    
+    float *output_stereo;
+    output_stereo = (float*)malloc(signal_length*info_wav_entrada.channels*sizeof(float));
 
-        for(i=0; i<signal_length; i++)
-        {
-            output_stereo[info_wav_entrada.channels*i] =   output_esquerdo[i];
-            output_stereo[info_wav_entrada.channels*i+1] = output_direito[i];
-        }
-        
-        sf_writef_float(wav_input, input_stereo, signal_length);
-        sf_writef_float(wav_output, output_stereo, signal_length);
-        
-        sf_close(wav_input);
-        sf_close(wav_output);
+    for(i=0; i<signal_length; i++)
+    {
+        output_stereo[info_wav_entrada.channels*i] =   output_esquerdo[i];
+        output_stereo[info_wav_entrada.channels*i+1] = output_direito[i];
+    }
+    
+    sf_writef_float(wav_input, input_stereo, signal_length);
+    sf_writef_float(wav_output, output_stereo, signal_length);
+    
+    sf_close(wav_input);
+    sf_close(wav_output);
+
+    // livrar as alocacoes fixas --------------------------------------------------------------------------------------
 
     free(in_buffer);
 
     free(esquerdo);
-    free(direito);
-
     free(output_esquerdo);
+    
+    free(direito);
     free(output_direito);
-
-    //free(residual_esquerdo);
-    //free(residual_direito);
 
     free(input_stereo);
     free(output_stereo);
 
+    // livrar as alocacoes residuais dos efeitos
+
+    livrar_residuais(&efeitoA);
+    livrar_residuais(&efeitoB);
+    livrar_residuais(&efeitoC);
+
+    // ----------------------------------------------------------------------------------------------------------------
     return 0;
 }

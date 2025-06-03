@@ -24,10 +24,22 @@
         char identificador;
         float parametro[NUMBER_OF_PARAMETERS];
 
+        float *x_residual_esquerdo;
+        float *y_residual_esquerdo;
+
+        float *x_residual_direito;
+        float *y_residual_direito;
+
     }type_effect;
 
 void inicializar_efeito(type_effect *efeito);
 
 void imprime_efeito(type_effect *efeito);
+
+void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada_direito, float *saida_esquerdo, float *saida_direito, long int signal_length, long int sampling_rate);
+
+void livrar_residuais(type_effect *efeito);
+
+void alocar_residuais(type_effect *efeito);
 
 #endif
