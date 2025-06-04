@@ -74,10 +74,14 @@ void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada
         
         case HIGHPASS:
 
+            highpass(entrada_esquerdo, saida_esquerdo, efeito->x_residual_esquerdo, efeito->y_residual_esquerdo, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
+            highpass(entrada_direito, saida_direito, efeito->x_residual_direito, efeito->y_residual_direito, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             break;
         
         case NOTCH:
 
+            notch(entrada_esquerdo, saida_esquerdo, efeito->x_residual_esquerdo, efeito->y_residual_esquerdo, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
+            notch(entrada_direito, saida_direito, efeito->x_residual_direito, efeito->y_residual_direito, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             break;
         
         default:

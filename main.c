@@ -9,7 +9,7 @@
 #include <math.h>
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
-#define TIME_LENGTH_SECONDS         7
+#define TIME_LENGTH_SECONDS         23
 
 long int i;
 
@@ -20,7 +20,7 @@ int main(){
         // abrir o arquivo de audio e obter metadados
         SF_INFO info_wav_entrada;
         info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_3.wav", SFM_READ, &info_wav_entrada);
+        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_6.wav", SFM_READ, &info_wav_entrada);
 
         // info temporal
         long int sampling_rate = info_wav_entrada.samplerate;
@@ -68,10 +68,10 @@ int main(){
         inicializar_efeito(&efeitoB); 
         inicializar_efeito(&efeitoC);
 
-        efeitoA.identificador = LOWPASS;
+        efeitoA.identificador = NOTCH;
         efeitoA.parametro[0] = 1;
-        efeitoA.parametro[1] = 100;
-        efeitoA.parametro[2] = 0.5;
+        efeitoA.parametro[1] = 400;
+        efeitoA.parametro[2] = 0.3;
 
         efeitoB.identificador = BUFFER;
         efeitoB.parametro[0] = 1;
