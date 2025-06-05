@@ -9,7 +9,7 @@
 #include <math.h>
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
-#define TIME_LENGTH_SECONDS         23
+#define TIME_LENGTH_SECONDS         14
 
 long int i;
 
@@ -68,28 +68,18 @@ int main(){
         inicializar_efeito(&efeitoB); 
         inicializar_efeito(&efeitoC);
 
-        efeitoA.identificador = NOTCH;
-        efeitoA.parametro[0] = 1;
-        efeitoA.parametro[1] = 400;
-        efeitoA.parametro[2] = 0.3;
-
-        efeitoB.identificador = BUFFER;
-        efeitoB.parametro[0] = 1;
-        efeitoB.parametro[1] = sampling_rate * 0.5;
-        efeitoB.parametro[2] = 0.3;
-
-        efeitoC.identificador = BUFFER;
-        efeitoC.parametro[0] = 1;
-        efeitoC.parametro[1] = sampling_rate * 0.7;
-        efeitoC.parametro[2] = 0.2;
+        FILE *file_preset;
+        file_preset = fopen("preset_1.bin", "rb");
+        carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
+        fclose(file_preset);
 
         imprime_efeito(&efeitoA);
         imprime_efeito(&efeitoB);
         imprime_efeito(&efeitoC);
 
-        alocar_residuais(&efeitoA);
-        alocar_residuais(&efeitoB);
-        alocar_residuais(&efeitoC);
+        alocar_residuais(&efeitoA, sampling_rate);
+        alocar_residuais(&efeitoB, sampling_rate);
+        alocar_residuais(&efeitoC, sampling_rate);
 
     // processamento do sinal ------------------------------------------------------------------------------------------
 

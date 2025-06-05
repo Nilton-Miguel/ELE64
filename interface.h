@@ -40,6 +40,10 @@ void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada
 
 void livrar_residuais(type_effect *efeito);
 
-void alocar_residuais(type_effect *efeito);
+void alocar_residuais(type_effect *efeito, long int sampling_rate);
+
+void escrever_preset(type_effect efeitoA, type_effect efeitoB, type_effect efeitoC, FILE *file);
+
+void carregar_preset(type_effect *efeitoA, type_effect *efeitoB, type_effect *efeitoC, FILE *file);
 
 #endif

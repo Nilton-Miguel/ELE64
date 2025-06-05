@@ -62,8 +62,8 @@ void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada
 
         case ECHO:
 
-            echo(entrada_esquerdo, saida_esquerdo, efeito -> y_residual_esquerdo, signal_length, efeito -> parametro[1], efeito -> parametro[2], efeito-> parametro[0]);
-            echo(entrada_direito, saida_direito, efeito -> y_residual_direito, signal_length, efeito -> parametro[1], efeito -> parametro[2], efeito-> parametro[0]);
+            echo(entrada_esquerdo, saida_esquerdo, efeito -> y_residual_esquerdo, signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
+            echo(entrada_direito, saida_direito, efeito -> y_residual_direito, signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
             break;
 
         case LOWPASS:
@@ -96,7 +96,7 @@ void livrar_residuais(type_effect *efeito)
     free(efeito -> x_residual_direito);
     free(efeito -> y_residual_direito);
 }
-void alocar_residuais(type_effect *efeito)
+void alocar_residuais(type_effect *efeito, long int sampling_rate)
 {
     switch (efeito -> identificador)
     {
@@ -107,12 +107,12 @@ void alocar_residuais(type_effect *efeito)
         // y : DURATION
         
         // alocar
-        efeito -> y_residual_esquerdo = (float*)malloc((efeito->parametro[1])*sizeof(float));
-        efeito -> y_residual_direito = (float*)malloc((efeito->parametro[1])*sizeof(float));
+        efeito -> y_residual_esquerdo = (float*)malloc((long int)(sampling_rate * efeito->parametro[1]) *sizeof(float));
+        efeito -> y_residual_direito = (float*)malloc((long int)(sampling_rate * efeito->parametro[1]) *sizeof(float));
 
         // inicializar
         long int j;
-        for(j=0; j<efeito->parametro[1]; j++)
+        for(j=0; j<(long int)(sampling_rate * efeito->parametro[1]); j++)
         {
             efeito -> y_residual_esquerdo[j] = 0;
             efeito -> y_residual_direito[j] = 0;
@@ -173,4 +173,30 @@ void alocar_residuais(type_effect *efeito)
 
         break;
     }
+}
+void escrever_preset(type_effect efeitoA, type_effect efeitoB, type_effect efeitoC, FILE *file)
+{
+    int j;
+    
+    fwrite(&efeitoA.identificador, 1, sizeof(char), file);
+    fwrite(&efeitoA.parametro[0], 4, sizeof(float), file);
+
+    fwrite(&efeitoB.identificador, 1, sizeof(char), file);
+    fwrite(&efeitoB.parametro[0], 4, sizeof(float), file);
+
+    fwrite(&efeitoC.identificador, 1, sizeof(char), file);
+    fwrite(&efeitoC.parametro[0], 4, sizeof(float), file);
+
+}
+void carregar_preset(type_effect *efeitoA, type_effect *efeitoB, type_effect *efeitoC, FILE *file)
+{
+
+    fread(&(efeitoA->identificador), 1, sizeof(char), file);
+    fread(&(efeitoA->parametro[0]), 4, sizeof(float), file);
+
+    fread(&(efeitoB->identificador), 1, sizeof(char), file);
+    fread(&(efeitoB->parametro[0]), 4, sizeof(float), file);
+
+    fread(&(efeitoC->identificador), 1, sizeof(char), file);
+    fread(&(efeitoC->parametro[0]), 4, sizeof(float), file);
 }

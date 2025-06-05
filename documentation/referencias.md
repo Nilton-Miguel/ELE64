@@ -76,3 +76,5 @@ Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
 
 [AutoMalloc](https://github.com/milen-patel/auto-malloc)
 
+[Biblioteca C - função fwrite()](https://www-tutorialspoint-com.translate.goog/c_standard_library/c_function_fwrite.htm?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc)
+
