@@ -69,7 +69,7 @@ int main(){
         inicializar_efeito(&efeitoC);
 
         FILE *file_preset;
-        file_preset = fopen("preset_1.bin", "rb");
+        file_preset = fopen("preset_2.bin", "rb");
         carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
         fclose(file_preset);
 
