@@ -9,7 +9,7 @@
 #include <math.h>
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   100
-#define TIME_LENGTH_SECONDS         20
+#define TIME_LENGTH_SECONDS         15
 
 long int i;
 
@@ -20,7 +20,7 @@ int main(){
         // abrir o arquivo de audio e obter metadados
         SF_INFO info_wav_entrada;
         info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_2.wav", SFM_READ, &info_wav_entrada);
+        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_6.wav", SFM_READ, &info_wav_entrada);
 
         // info temporal
         long int sampling_rate = info_wav_entrada.samplerate;
@@ -69,7 +69,7 @@ int main(){
         inicializar_efeito(&efeitoC);
 
         FILE *file_preset;
-        file_preset = fopen("preset_2.bin", "rb");
+        file_preset = fopen("preset_1.bin", "rb");
         carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
         fclose(file_preset);
 

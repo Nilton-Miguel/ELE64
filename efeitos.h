@@ -20,12 +20,12 @@ void saturador_soft(float *sinal, float *output, int LENGTH, float JANELA, float
 
 void saturador_hard(float *sinal, float *output, int LENGTH, float JANELA, float GANHO);
 
-void echo(float *sinal, float *output, float *y_residual, long int * indexador_externo, int LENGTH, float DURATION, long int sampling_rate, float DECAY, float WET);
+void echo(float *sinal, float *output, float *y_residual, long int *indexador_externo, int LENGTH, float DURATION, long int sampling_rate, float DECAY, float WET);
 
 void lowpass(float *sinal, float *output, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET);
 
 void highpass(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET);
 
-void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET);
+void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int *indexador_externo, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET);
 
 #endif

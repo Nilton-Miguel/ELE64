@@ -16,10 +16,10 @@ int main(){
     inicializar_efeito(&efeitoB);
     inicializar_efeito(&efeitoC);
 
-        efeitoA.identificador = ECHO;
-        efeitoA.parametro[0] = 1;
-        efeitoA.parametro[1] = 1.7;
-        efeitoA.parametro[2] = 0.3;
+        efeitoA.identificador = BUFFER;
+        efeitoA.parametro[0] = 0;
+        efeitoA.parametro[1] = 0;
+        efeitoA.parametro[2] = 0;
         efeitoA.parametro[3] = 0;
 
         efeitoB.identificador = BUFFER;
@@ -35,7 +35,7 @@ int main(){
         efeitoC.parametro[3] = 0;
 
     FILE *file_preset;
-    file_preset = fopen("preset_2.bin", "wb");
+    file_preset = fopen("preset_1.bin", "wb");
     escrever_preset(efeitoA, efeitoB, efeitoC, file_preset);
     fclose(file_preset);
 

@@ -130,7 +130,7 @@ void highpass(float *sinal, float *output, float *x_residual, float *y_residual,
         y_residual[0] = output[j];
     }
 }
-void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET)
+void notch(float *sinal, float *output, float *x_residual, float *y_residual, long int *indexador_externo, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET)
 {
     // memoria residual
     // x : 2
@@ -152,12 +152,19 @@ void notch(float *sinal, float *output, float *x_residual, float *y_residual, lo
     long int j;
     for(j=0; j<LENGTH; j++)
     {
-        passado     = (2 + j) % 2;
-        antepassado = (3 + j) % 2;
+        // indexador externo é usado para calcular os indices modulares
+        passado     = (2 + *(indexador_externo)) % 2;
+        antepassado = (3 + *(indexador_externo)) % 2;
+
+        //printf("%ld : passado: %d antepassado: %d\n", *(indexador_externo), passado, antepassado);
 
         output[j] = WET*(NORMA*(sinal[j] - A*x_residual[passado] + x_residual[antepassado]) +B*y_residual[passado] - C*y_residual[antepassado]) + DRY*(sinal[j]);
 
         x_residual[antepassado] = sinal[j];
         y_residual[antepassado] = output[j];
+
+        // j incrementa indexador_externo, que vai de 0 a 999 (essa abordagem funcionou melhor para multiplos ponteiros relativos)
+        *(indexador_externo) += 1;
+        if (*(indexador_externo) >= 1000) *(indexador_externo) -= 1000;
     }
 }
