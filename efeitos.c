@@ -69,7 +69,7 @@ void saturador_hard(float *sinal, float *output, int LENGTH, float JANELA, float
         else if (output[j] <= -JANELA)  output[j] = -JANELA;
     }
 }
-void echo(float *sinal, float *output, float *y_residual, int LENGTH, float DURATION, long int sampling_rate, float DECAY, float WET)
+void echo(float *sinal, float *output, float *y_residual, long int * indexador_externo, int LENGTH, float DURATION, long int sampling_rate, float DECAY, float WET)
 {
     // memoria residual
     // x : 0
@@ -77,16 +77,20 @@ void echo(float *sinal, float *output, float *y_residual, int LENGTH, float DURA
 
     // converte DURATION de segundos para amostras
     long int SAMPLE_DURATION = (long int)(DURATION * sampling_rate);
-
+    //int mod_j = 0;
     float DRY = 1 - WET;
 
     long int j;
     for(j=0; j<LENGTH; j++)
     {
-        int mod_j = (SAMPLE_DURATION + j) % SAMPLE_DURATION;
+        //mod_j = (SAMPLE_DURATION + j) % SAMPLE_DURATION;
+        //printf("J: %ld EX: %ld\n", j, *(indexador_externo));
 
-        output[j] = WET*(sinal[j] + DECAY * y_residual[mod_j]) + DRY*(sinal[j]);
-        y_residual[mod_j] = output[j];
+        output[j] = WET*(sinal[j] + DECAY * y_residual[*(indexador_externo)]) + DRY*(sinal[j]);
+        y_residual[*(indexador_externo)] = output[j];
+
+        *(indexador_externo) += 1;
+        if (*(indexador_externo) >= SAMPLE_DURATION) *(indexador_externo) -= SAMPLE_DURATION;
     }
 }
 void lowpass(float *sinal, float *output, float *y_residual, long int sampling_rate, int LENGTH, float ANALOG_FREQUENCY, float WET)

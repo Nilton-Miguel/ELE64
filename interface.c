@@ -16,6 +16,9 @@ void inicializar_efeito(type_effect *efeito)
 
     efeito -> x_residual_direito = NULL;
     efeito -> y_residual_direito = NULL;
+
+    efeito -> indexador_modular_cumulativo_esquerdo = 0;
+    efeito -> indexador_modular_cumulativo_direito = 0;
 }
 void imprime_efeito(type_effect *efeito)
 {
@@ -62,8 +65,8 @@ void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada
 
         case ECHO:
 
-            echo(entrada_esquerdo, saida_esquerdo, efeito -> y_residual_esquerdo, signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
-            echo(entrada_direito, saida_direito, efeito -> y_residual_direito, signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
+            echo(entrada_esquerdo, saida_esquerdo, efeito -> y_residual_esquerdo, &(efeito -> indexador_modular_cumulativo_esquerdo), signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
+            echo(entrada_direito, saida_direito, efeito -> y_residual_direito, &(efeito -> indexador_modular_cumulativo_direito),  signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
             break;
 
         case LOWPASS:

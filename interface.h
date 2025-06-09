@@ -30,6 +30,9 @@
         float *x_residual_direito;
         float *y_residual_direito;
 
+        long int indexador_modular_cumulativo_esquerdo;
+        long int indexador_modular_cumulativo_direito;
+
     }type_effect;
 
 void inicializar_efeito(type_effect *efeito);

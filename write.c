@@ -16,21 +16,21 @@ int main(){
     inicializar_efeito(&efeitoB);
     inicializar_efeito(&efeitoC);
 
-        efeitoA.identificador = LOWPASS;
+        efeitoA.identificador = ECHO;
         efeitoA.parametro[0] = 1;
-        efeitoA.parametro[1] = 5;
-        efeitoA.parametro[2] = 0;
+        efeitoA.parametro[1] = 1.7;
+        efeitoA.parametro[2] = 0.3;
         efeitoA.parametro[3] = 0;
 
-        efeitoB.identificador = HARD_AMP;
-        efeitoB.parametro[0] = 500;
+        efeitoB.identificador = BUFFER;
+        efeitoB.parametro[0] = 0;
         efeitoB.parametro[1] = 0;
         efeitoB.parametro[2] = 0;
         efeitoB.parametro[3] = 0;
 
-        efeitoC.identificador = LOWPASS;
-        efeitoC.parametro[0] = 1;
-        efeitoC.parametro[1] = 5;
+        efeitoC.identificador = BUFFER;
+        efeitoC.parametro[0] = 0;
+        efeitoC.parametro[1] = 0;
         efeitoC.parametro[2] = 0;
         efeitoC.parametro[3] = 0;
 
