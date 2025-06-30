@@ -1,12 +1,17 @@
-
 #include "interface.h"
 #include "efeitos.h"
 
+#include <alsa/asoundlib.h>
 #include <sndfile.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
+#define SAMPLE_RATE 96000
+#define CHANNELS 2
+#define FORMAT SND_PCM_FORMAT_S32_LE
+#define LATENCY 500000
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
 #define TIME_LENGTH_SECONDS         14
@@ -14,143 +19,135 @@
 long int i;
 
 int main(){
+	int retVal = 0;
+	snd_pcm_t *playbackHandle;
+	snd_pcm_t *captureHandle;
+	int err = 0;
 
-    // leitura do audio -----------------------------------------------------------------------------------------------
+	// Open PCM device for capture/playback
+	if((err = snd_pcm_open(&playbackHandle, "hw:1,0", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+		fprintf(stderr, "Cannot open playback device: %s\n", snd_strerror(err));
+		return err;
+	}
+	if((err = snd_pcm_open(&captureHandle, "hw:1,1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+		fprintf(stderr, "Cannot open capture device: %s\n", snd_strerror(err));
+		return err;
+	}
 
-        // abrir o arquivo de audio e obter metadados
-        SF_INFO info_wav_entrada;
-        info_wav_entrada.format = 0;
-        SNDFILE * wav_entrada = sf_open("audio_snippets/audio_snippet_6.wav", SFM_READ, &info_wav_entrada);
+	// Configure parameters for capture/playback
+	snd_pcm_format_t format = FORMAT;
+	snd_pcm_access_t access = SND_PCM_ACCESS_RW_INTERLEAVED;
+	unsigned int channels = CHANNELS;
+	unsigned int rate = SAMPLE_RATE;
+	int resample = 0;
+	unsigned int latency = LATENCY;
 
-        // info temporal
-        long int sampling_rate = info_wav_entrada.samplerate;
-        long int signal_length = TIME_LENGTH_SECONDS * sampling_rate;
+	if((err = snd_pcm_set_params(captureHandle, format, access, channels, rate, resample, latency)) < 0) {
+		fprintf(stderr, "Cannot set parameters: %s\n", snd_strerror(err));
+		return err;
+	}
+	if((err = snd_pcm_set_params(playbackHandle, format, access, channels, rate, resample, latency)) < 0) {
+		fprintf(stderr, "Cannot set parameters: %s\n", snd_strerror(err));
+		return err;
+	}
 
-    // um buffer de floats pra receber todos os frames (n canais por frame)
-    sf_count_t REQUESTED_FRAMES = signal_length;
-    long int BUFFER_SIZE = REQUESTED_FRAMES * info_wav_entrada.channels;
-    float * in_buffer;
-    in_buffer = (float*) malloc(BUFFER_SIZE * sizeof(float));
-    
-    sf_readf_float (wav_entrada, in_buffer, REQUESTED_FRAMES);
+	// Alocate buffer
+	unsigned int signal_length = rate/1000 * latency/1000;
+	int format_width = snd_pcm_format_width(format) / 8;
 
-    // cada sinal a ser processado deve receber apenas um canal do buffer 
-    // esquerdo : canal 0
-    // direito  : canal 1
-    float *esquerdo;
-    esquerdo = (float*) malloc(signal_length * sizeof(float));
+	printf("Buffer size: %d frames, %d samples\n", signal_length, signal_length * channels);
+	int *readBuffer = malloc(signal_length * format_width * channels);
+	int *writeBuffer = malloc(signal_length * format_width * channels);
+	float *esquerdo = malloc(signal_length * sizeof(float));
+	float *direito = malloc(signal_length * sizeof(float));
 
-    float *direito;
-    direito = (float*) malloc(signal_length * sizeof(float));
-    
-    for (i = 0; i < signal_length; i++)
-    {
-        esquerdo[i]     = in_buffer[info_wav_entrada.channels * i];
-        direito[i]      = in_buffer[info_wav_entrada.channels * i + 1];
-    }
+	// Initialize output buffer with zeros for first loop
+	for(int i = 0; i < signal_length * channels; i++) {
+		writeBuffer[i] = 0;
+	}
 
-    sf_close  (wav_entrada);
+	// Prepare processing
+	type_effect efeitoA, efeitoB, efeitoC;
+	inicializar_efeito(&efeitoA);
+	inicializar_efeito(&efeitoB);
+	inicializar_efeito(&efeitoC);
 
-    // processamento do audio ------------------------------------------------------------------------------------------
+	FILE *file_preset;
+	file_preset = fopen("preset_1.bin", "rb");
+	carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
+	fclose(file_preset);
 
-    // cada canal precisa ser processado separadamente
-    float *output_esquerdo;
-    output_esquerdo = (float*) malloc(signal_length * sizeof(float));
+	imprime_efeito(&efeitoA);
+	imprime_efeito(&efeitoB);
+	imprime_efeito(&efeitoC);
 
-    float *output_direito;
-    output_direito = (float*) malloc(signal_length * sizeof(float));
+	alocar_residuais(&efeitoA, SAMPLE_RATE);
+	alocar_residuais(&efeitoB, SAMPLE_RATE);
+	alocar_residuais(&efeitoC, SAMPLE_RATE);
 
-    // leitura dos presets ---------------------------------------------------------------------------------------------
+	// Prepare interface
+	if((err = snd_pcm_prepare(playbackHandle)) < 0) {
+		fprintf(stderr, "Cannot prepare playback: %s\n", snd_strerror(err));
+		return err;
+	}
+	if((err = snd_pcm_prepare(captureHandle)) < 0) {
+		fprintf(stderr, "Cannot prepare capture: %s\n", snd_strerror(err));
+		return err;
+	}
 
-        type_effect efeitoA, efeitoB, efeitoC;
+	// Audio processing loop
+	while(1) {
+		// Read from capture
+		int readn = snd_pcm_readi(captureHandle, readBuffer, signal_length);
+		if(readn < 0) {
+			fprintf(stderr, "Read failed: %s\n", snd_strerror(readn));
+			int recover = snd_pcm_recover(captureHandle, readn, 0);
+			if(recover < 0) {
+				fprintf(stderr, "Failed to recover ALSA state\n");
+				err = readn;
+				break;
+			}
+			fprintf(stderr, "ALSA State recovered\n");
+		}
+		// Write to playback
+		int writen = snd_pcm_writei(playbackHandle, writeBuffer, signal_length);
+		if(writen < 0) {
+			fprintf(stderr, "Write failed: %s\n", snd_strerror(writen));
+			int recover = snd_pcm_recover(playbackHandle, writen, 0);
+			if(recover < 0) {
+				fprintf(stderr, "Failed to recover ALSA state\n");
+				err = writen;
+				break;
+			}
+			fprintf(stderr, "ALSA State recovered\n");
+		}
+		printf("Read %d frames, wrote %d frames.\n", readn, writen);
 
-        inicializar_efeito(&efeitoA); 
-        inicializar_efeito(&efeitoB); 
-        inicializar_efeito(&efeitoC);
+		// Processing
+		for(int i = 0; i < signal_length; i++) {
+			esquerdo[i] = (float)readBuffer[channels * i];
+			direito[i] = (float)readBuffer[channels * i + 1];
+		}
+		switch_process(&efeitoA, esquerdo, direito, esquerdo, direito, signal_length, SAMPLE_RATE);
+		//switch_process(&efeitoB, esquerdo, direito, esquerdo, direito, signal_length, SAMPLE_RATE);
+		//switch_process(&efeitoC, esquerdo, direito, esquerdo, direito, signal_length, SAMPLE_RATE);
+		for(int i = 0; i < signal_length; i++) {
+			writeBuffer[channels * i] = (int)esquerdo[i];
+			writeBuffer[channels * i + 1] = (int)direito[i];
+		}
+	}
+	// Close interface
+	snd_pcm_close(playbackHandle);
+	snd_pcm_close(captureHandle);
 
-        FILE *file_preset;
-        file_preset = fopen("preset_2.bin", "rb");
-        carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
-        fclose(file_preset);
+	// Desalocar buffers e residuais 
+	livrar_residuais(&efeitoA);
+	livrar_residuais(&efeitoB);
+	livrar_residuais(&efeitoC);
+	free(readBuffer);
+	free(writeBuffer);
+	free(esquerdo);
+	free(direito);
 
-        imprime_efeito(&efeitoA);
-        imprime_efeito(&efeitoB);
-        imprime_efeito(&efeitoC);
-
-        alocar_residuais(&efeitoA, sampling_rate);
-        alocar_residuais(&efeitoB, sampling_rate);
-        alocar_residuais(&efeitoC, sampling_rate);
-
-    // processamento do sinal ------------------------------------------------------------------------------------------
-
-    switch_process(&efeitoA, esquerdo, direito, output_esquerdo, output_direito, signal_length, sampling_rate);
-    switch_process(&efeitoB, output_esquerdo, output_direito, output_esquerdo, output_direito, signal_length, sampling_rate);
-    switch_process(&efeitoC, output_esquerdo, output_direito, output_esquerdo, output_direito, signal_length, sampling_rate);
-
-    // audio output ----------------------------------------------------------------------------------------------------
-
-    // gerar as structs de info dos arquivos
-
-        SF_INFO info_wav_input;
-        SF_INFO info_wav_output;
-
-        info_wav_input.samplerate = sampling_rate;
-        info_wav_input.channels = 2;
-        info_wav_input.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
-
-        info_wav_output.samplerate = sampling_rate;
-        info_wav_output.channels = 2;
-        info_wav_output.format = SF_FORMAT_WAV | SF_FORMAT_PCM_24;
-
-    // abrir os arquivos em modo de escrita
-    SNDFILE * wav_input =   sf_open("in.wav", SFM_WRITE, &info_wav_input);
-    SNDFILE * wav_output =  sf_open("out.wav", SFM_WRITE, &info_wav_output);
-
-    // escrever os dados e liberar os arquivos
-    
-    float *input_stereo;
-    input_stereo = (float*)malloc(signal_length*info_wav_entrada.channels*sizeof(float));
-
-    for(i=0; i<signal_length; i++)
-    {
-        input_stereo[info_wav_entrada.channels*i] =   esquerdo[i];
-        input_stereo[info_wav_entrada.channels*i+1] = direito[i];
-    }
-    
-    float *output_stereo;
-    output_stereo = (float*)malloc(signal_length*info_wav_entrada.channels*sizeof(float));
-
-    for(i=0; i<signal_length; i++)
-    {
-        output_stereo[info_wav_entrada.channels*i] =   output_esquerdo[i];
-        output_stereo[info_wav_entrada.channels*i+1] = output_direito[i];
-    }
-    
-    sf_writef_float(wav_input, input_stereo, signal_length);
-    sf_writef_float(wav_output, output_stereo, signal_length);
-    
-    sf_close(wav_input);
-    sf_close(wav_output);
-
-    // livrar as alocacoes fixas --------------------------------------------------------------------------------------
-
-    free(in_buffer);
-
-    free(esquerdo);
-    free(output_esquerdo);
-    
-    free(direito);
-    free(output_direito);
-
-    free(input_stereo);
-    free(output_stereo);
-
-    // livrar as alocacoes residuais dos efeitos
-
-    livrar_residuais(&efeitoA);
-    livrar_residuais(&efeitoB);
-    livrar_residuais(&efeitoC);
-
-    // ----------------------------------------------------------------------------------------------------------------
-    return 0;
+	return err;
 }
