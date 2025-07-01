@@ -1,9 +1,7 @@
-efeitos.o
-in.wav
-interface.o
-libprocoffee.a
+*.wav
+*.o
+*.bin
+*.a
 main
-out.wav
-preset_1.bin
 write
 .vscode/
