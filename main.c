@@ -57,7 +57,7 @@ int main(){
 	unsigned int signal_samples = signal_frames * channels;
 	unsigned int format_width = snd_pcm_format_width(format) / 8;
 
-	printf("Buffer size: %d samples, %d frames\n", signal_frames, signal_samples);
+	printf("Buffer size: %d frames, %d samples\n", signal_frames, signal_samples);
 	float *readBuffer = malloc(signal_samples * format_width);
 	float *writeBuffer = malloc(signal_samples * format_width);
 	float *esquerdo = malloc(signal_frames * format_width);
