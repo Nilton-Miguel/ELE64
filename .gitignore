@@ -1,0 +1,7 @@
+*.wav
+*.o
+*.bin
+*.a
+main
+write
+.vscode/
