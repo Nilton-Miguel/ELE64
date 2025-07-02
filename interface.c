@@ -16,6 +16,9 @@ void inicializar_efeito(type_effect *efeito)
 
     efeito -> x_residual_direito = NULL;
     efeito -> y_residual_direito = NULL;
+
+    efeito -> indexador_modular_cumulativo_esquerdo = 0;
+    efeito -> indexador_modular_cumulativo_direito = 0;
 }
 void imprime_efeito(type_effect *efeito)
 {
@@ -23,7 +26,7 @@ void imprime_efeito(type_effect *efeito)
     printf("parametros: ");
     int j;
     for(j=0; j<NUMBER_OF_PARAMETERS; j++) printf("%f ", efeito -> parametro[j]);
-    
+
     printf("\n");
 }
 void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada_direito, float *saida_esquerdo, float *saida_direito, long int signal_length, long int sampling_rate)
@@ -62,8 +65,8 @@ void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada
 
         case ECHO:
 
-            echo(entrada_esquerdo, saida_esquerdo, efeito -> y_residual_esquerdo, signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
-            echo(entrada_direito, saida_direito, efeito -> y_residual_direito, signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
+            echo(entrada_esquerdo, saida_esquerdo, efeito -> y_residual_esquerdo, &(efeito -> indexador_modular_cumulativo_esquerdo), signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
+            echo(entrada_direito, saida_direito, efeito -> y_residual_direito, &(efeito -> indexador_modular_cumulativo_direito),  signal_length, efeito -> parametro[1], sampling_rate, efeito -> parametro[2], efeito-> parametro[0]);
             break;
 
         case LOWPASS:
@@ -71,19 +74,19 @@ void switch_process(type_effect *efeito, float *entrada_esquerdo, float *entrada
             lowpass(entrada_esquerdo, saida_esquerdo, efeito->y_residual_esquerdo, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             lowpass(entrada_direito, saida_direito, efeito->y_residual_direito, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             break;
-        
+
         case HIGHPASS:
 
             highpass(entrada_esquerdo, saida_esquerdo, efeito->x_residual_esquerdo, efeito->y_residual_esquerdo, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             highpass(entrada_direito, saida_direito, efeito->x_residual_direito, efeito->y_residual_direito, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             break;
-        
+
         case NOTCH:
 
-            notch(entrada_esquerdo, saida_esquerdo, efeito->x_residual_esquerdo, efeito->y_residual_esquerdo, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
-            notch(entrada_direito, saida_direito, efeito->x_residual_direito, efeito->y_residual_direito, sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
+            notch(entrada_esquerdo, saida_esquerdo, efeito->x_residual_esquerdo, efeito->y_residual_esquerdo, &(efeito -> indexador_modular_cumulativo_esquerdo), sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
+            notch(entrada_direito, saida_direito, efeito->x_residual_direito, efeito->y_residual_direito, &(efeito -> indexador_modular_cumulativo_direito), sampling_rate, signal_length, efeito->parametro[1], efeito->parametro[0]);
             break;
-        
+
         default:
 
             break;
@@ -177,7 +180,7 @@ void alocar_residuais(type_effect *efeito, long int sampling_rate)
 void escrever_preset(type_effect efeitoA, type_effect efeitoB, type_effect efeitoC, FILE *file)
 {
     int j;
-    
+
     fwrite(&efeitoA.identificador, 1, sizeof(char), file);
     fwrite(&efeitoA.parametro[0], 4, sizeof(float), file);
 
