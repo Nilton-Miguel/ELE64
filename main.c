@@ -53,17 +53,18 @@ int main(){
 	}
 
 	// Alocate buffer
-	unsigned int signal_length = 512;
-	int format_width = snd_pcm_format_width(format) / 8;
+	unsigned int signal_frames = BUFFER_SIZE;
+	unsigned int signal_samples = signal_frames * channels;
+	unsigned int format_width = snd_pcm_format_width(format) / 8;
 
-	printf("Buffer size: %d frames, %d samples\n", BUFFER_SIZE, BUFFER_SIZE * channels);
-	float *readBuffer = malloc(BUFFER_SIZE * format_width * channels);
-	float *writeBuffer = malloc(BUFFER_SIZE * format_width * channels);
-	float *esquerdo = malloc(BUFFER_SIZE * sizeof(float));
-	float *direito = malloc(BUFFER_SIZE * sizeof(float));
+	printf("Buffer size: %d samples, %d frames\n", signal_frames, signal_samples);
+	float *readBuffer = malloc(signal_samples * format_width);
+	float *writeBuffer = malloc(signal_samples * format_width);
+	float *esquerdo = malloc(signal_frames * format_width);
+	float *direito = malloc(signal_frames * format_width);
 
 	// Initialize output buffer with zeros for first loop
-	for(int i = 0; i < BUFFER_SIZE * channels; i++) {
+	for(int i = 0; i < signal_frames * channels; i++) {
 		writeBuffer[i] = 0;
 	}
 
@@ -82,9 +83,9 @@ int main(){
 	imprime_efeito(&efeitoB);
 	imprime_efeito(&efeitoC);
 
-	alocar_residuais(&efeitoA, SAMPLE_RATE);
-	alocar_residuais(&efeitoB, SAMPLE_RATE);
-	alocar_residuais(&efeitoC, SAMPLE_RATE);
+	alocar_residuais(&efeitoA, rate);
+	alocar_residuais(&efeitoB, rate);
+	alocar_residuais(&efeitoC, rate);
 
 	/*
 	// Prepare interface
@@ -105,14 +106,14 @@ int main(){
 		return err;
 	}
 
-	printf("Waiting for capture device to deliver %d frames...\n", BUFFER_SIZE);
+	printf("Waiting for capture device to deliver %d frames...\n", signal_frames);
 
 	unsigned long avail = 0;
 	do {
 		avail = snd_pcm_avail(captureHandle);
 		//printf("%d\n", avail);
 	}
-	while(avail < BUFFER_SIZE);
+	while(avail < signal_frames);
 
 	printf("Entering audio processing loop!\n");
 
@@ -120,7 +121,7 @@ int main(){
 	while(1) {
 		// Read from capture
 		//printf("To capture: %d frames; To playback: %d frames\n", snd_pcm_avail(captureHandle), snd_pcm_avail(playbackHandle));
-		int readn = snd_pcm_readi(captureHandle, readBuffer, BUFFER_SIZE);
+		int readn = snd_pcm_readi(captureHandle, readBuffer, signal_frames);
 		if(readn < 0) {
 			//fprintf(stderr, "Read failed: %s\n", snd_strerror(readn));
 			int recover = snd_pcm_recover(captureHandle, readn, 0);
@@ -132,20 +133,20 @@ int main(){
 			//fprintf(stderr, "ALSA State recovered\n");
 		}
 		// Processing
-		for(int i = 0; i < BUFFER_SIZE; i++) {
+		for(int i = 0; i < signal_frames; i++) {
 			esquerdo[i] = readBuffer[channels * i];
 			direito[i] = readBuffer[channels * i + 1];
 		}
-		//bufferi(readBuffer, writeBuffer, BUFFER_SIZE);
-		switch_process(&efeitoA, esquerdo, direito, esquerdo, direito, BUFFER_SIZE, SAMPLE_RATE);
-		switch_process(&efeitoB, esquerdo, direito, esquerdo, direito, BUFFER_SIZE, SAMPLE_RATE);
-		switch_process(&efeitoC, esquerdo, direito, esquerdo, direito, BUFFER_SIZE, SAMPLE_RATE);
-		for(int i = 0; i < BUFFER_SIZE; i++) {
+		//bufferi(readBuffer, writeBuffer, signal_frames);
+		switch_process(&efeitoA, esquerdo, direito, esquerdo, direito, signal_frames, rate);
+		switch_process(&efeitoB, esquerdo, direito, esquerdo, direito, signal_frames, rate);
+		switch_process(&efeitoC, esquerdo, direito, esquerdo, direito, signal_frames, rate);
+		for(int i = 0; i < signal_frames; i++) {
 			writeBuffer[channels * i] = esquerdo[i];
 			writeBuffer[channels * i + 1] = direito[i];
 		}
 		// Write to playback
-		int writen = snd_pcm_writei(playbackHandle, writeBuffer, BUFFER_SIZE);
+		int writen = snd_pcm_writei(playbackHandle, writeBuffer, signal_frames);
 		if(writen < 0) {
 			//fprintf(stderr, "Write failed: %s\n", snd_strerror(writen));
 			int recover = snd_pcm_recover(playbackHandle, writen, 0);
