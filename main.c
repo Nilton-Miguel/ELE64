@@ -64,7 +64,7 @@ int main(){
 	float *direito = malloc(signal_frames * format_width);
 
 	// Initialize output buffer with zeros for first loop
-	for(int i = 0; i < signal_frames * channels; i++) {
+	for(int i = 0; i < signal_samples; i++) {
 		writeBuffer[i] = 0;
 	}
 
@@ -75,7 +75,7 @@ int main(){
 	inicializar_efeito(&efeitoC);
 
 	FILE *file_preset;
-	file_preset = fopen("preset_2.bin", "rb");
+	file_preset = fopen("preset_1.bin", "rb");
 	carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
 	fclose(file_preset);
 
