@@ -12,7 +12,7 @@
 #define SAMPLE_RATE 48000
 #define CHANNELS 2
 #define FORMAT SND_PCM_FORMAT_FLOAT_LE
-#define LATENCY 100000
+#define LATENCY 10000
 #define BUFFER_SIZE 64
 
 #define SAMPLE_WINDOW_BUFFER_SIZE   1024
@@ -65,7 +65,7 @@ int main(){
 
 	// Initialize output buffer with zeros for first loop
 	for(int i = 0; i < signal_samples; i++) {
-		writeBuffer[i] = 0;
+		writeBuffer[i] = 0.0;
 	}
 
 	// Prepare processing
@@ -75,7 +75,7 @@ int main(){
 	inicializar_efeito(&efeitoC);
 
 	FILE *file_preset;
-	file_preset = fopen("preset_1.bin", "rb");
+	file_preset = fopen("preset_2.bin", "rb");
 	carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
 	fclose(file_preset);
 

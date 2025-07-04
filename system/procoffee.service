@@ -1,0 +1,9 @@
+[Unit]
+Description=Rodar processamento de audio
+
+[Service]
+ExecStart=/usr/local/bin/procoffee.sh
+
+[Install]
+WantedBy=multi-user.target
+
