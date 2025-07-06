@@ -59,6 +59,9 @@ Status::Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_
   // suporte ao encoder rotativo
   ENCODER_PULSE_COUNTER = 0;
 
+  // flag que sobe se alguma atividade relevante ocorrer
+  ACTIVITY = 0;
+
   // alocação dinâmica dos efeitos para o buffer preset
   int j;
   for(j=0; j<3; j++)
@@ -197,8 +200,13 @@ void Status::updateStatus()
 
 void Status::inputHandler()
 {
+
+  ACTIVITY = 0;
+
   if(getDifferenceButA() && NEW_STATUS_BUT_A == 0)
   {
+    ACTIVITY = 1;
+
     switch(INTERFACE_STATE)
     {
       case PRESET_SELECT:
@@ -326,6 +334,8 @@ void Status::inputHandler()
   }
   else if(getDifferenceButB() && NEW_STATUS_BUT_B == 0)
   {
+    ACTIVITY = 1;
+    
     switch(INTERFACE_STATE)
     {
       case PRESET_SELECT: 
@@ -389,6 +399,8 @@ void Status::inputHandler()
   }
   else if(getCursorUp())
   {
+    ACTIVITY = 1;
+
     // output da função age como uma flag que é baixada quando o input é atendido
     ENCODER_PULSE_COUNTER = 0;
 
@@ -773,6 +785,8 @@ void Status::inputHandler()
   }
   else if(getCursorDown())
   {
+    ACTIVITY = 1;
+
     // output da função age como uma flag que é baixada quando o input é atendido
     ENCODER_PULSE_COUNTER = 0;
 
@@ -1153,6 +1167,8 @@ void Status::inputHandler()
   }
   else if(getDifferenceEncoderSwitch() && NEW_STATUS_ENCODER_SW == 1)
   {
+    ACTIVITY = 1;
+
     switch(INTERFACE_STATE)
     {
       case PRESET_SELECT:
@@ -1212,29 +1228,24 @@ int Status::getDifferenceButA()
 {
   return ((OLD_STATUS_BUT_A != NEW_STATUS_BUT_A));
 }
-
 int Status::getDifferenceButB()
 {
   return ((OLD_STATUS_BUT_B != NEW_STATUS_BUT_B));
 }
-
 int Status::getDifferenceEncoderSwitch()
 {
   return ((OLD_STATUS_ENCODER_SW != NEW_STATUS_ENCODER_SW));
 }
-
-int Status::incrementarEncoderPulseCounter()
+void Status::incrementarEncoderPulseCounter()
 {
   //if(ENCODER_PULSE_COUNTER < 0) ENCODER_PULSE_COUNTER = 0;
   ENCODER_PULSE_COUNTER++;
 }
-
-int Status::decrementarEncoderPulseCounter()
+void Status::decrementarEncoderPulseCounter()
 {
   //if(ENCODER_PULSE_COUNTER > 0) ENCODER_PULSE_COUNTER = 0;
   ENCODER_PULSE_COUNTER--;
 }
-
 int Status::getCursorUp()
 {
   if(ENCODER_PULSE_COUNTER > ENCODER_COUNTER_THRESHOLD) 
@@ -1243,7 +1254,6 @@ int Status::getCursorUp()
   }
   else return 0;
 }
-
 int Status::getCursorDown()
 {
   if(ENCODER_PULSE_COUNTER < -ENCODER_COUNTER_THRESHOLD)
@@ -1251,4 +1261,32 @@ int Status::getCursorDown()
     return 1;
   }
   else return 0;
+}
+int Status::getActivity()
+{
+  return ACTIVITY;
+}
+SCREEN_STATE Status::getInterfaceState()
+{
+  return INTERFACE_STATE;
+}
+int Status::getCursorPosition()
+{
+  return INTERFACE_CURSOR_POSITION;
+}
+int Status::getPaginaVirtual()
+{
+  return PAGINA_VIRTUAL;
+}
+int Status::getActivePreset()
+{
+  return ACTIVE_PRESET_FILE;
+}
+int Status::getActiveEffect()
+{
+  return ACTIVE_EFFECT;
+}
+int Status::getActiveParam()
+{
+  return ACTIVE_PARAM;
 }

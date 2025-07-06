@@ -87,22 +87,50 @@ void loop() {
 
   status.updateStatus();
 
-  switch(display_choice)
+  if(status.getActivity())
   {
-    case 1:
-      
-      status.printEfeito(0);
-      break;
-    
-    case 2:
-      status.printEfeito(1);
-      break;
-    
-    case 3:
-      status.printEfeito(2);
-      break;
 
-    default:
-      status.printStatus();
+    // esses dados agora podem ser acessados publicamente
+    Serial.print(status.getInterfaceState());
+    Serial.print(" ");
+    Serial.print(status.getCursorPosition());
+    Serial.print(" ");
+    Serial.print(status.getPaginaVirtual());
+    Serial.print(" ");
+    Serial.print(status.getActivePreset());
+    Serial.print(" ");
+    Serial.print(status.getActiveEffect());
+    Serial.print(" ");
+    Serial.print(status.getActiveParam());
+    Serial.print(" ");
+
+    Serial.println();
   }
+
+  /*
+  if(status.getActivity())
+  {
+
+    switch(display_choice)
+    {
+      case 1:
+        
+        status.printEfeito(0);
+        break;
+      
+      case 2:
+        status.printEfeito(1);
+        break;
+      
+      case 3:
+        status.printEfeito(2);
+        break;
+
+      default:
+        status.printStatus();
+    }
+  }
+  */
+
+  delay(10);
 }
