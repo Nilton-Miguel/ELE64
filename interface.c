@@ -1,4 +1,26 @@
 
+/*  --------------------------------------------------------------------------------------------------------------
+
+    autor: Nilton Miguel Guimaraes de Souza
+    info:  Brasil Parana Curitiba 01/06/2025
+
+    Esta biblioteca foi desenvolvida para fins academicos na disciplina "ELE64 - Oficina de Integracao UTFPR CT"
+
+    Nesta biblioteca consta um conjunto de metodos para interface entre a biblioteca efeitos.c e arquivos de 
+    preset. Por meio desta podemos escrever arquivos estruturados de tal forma que o codigo principal possa
+    alocar autonomamente todos os recursos que precisa para que o processamento ocorra da forma desejada.
+    --------------------------------------------------------------------------------------------------------------
+
+    author: Nilton Miguel Guimaraes de Souza
+    info:   Brasil Parana Curitiba 23/05/2025
+
+    This library was developed with academic objectives for the course "ELE64 - Oficina de Integracao UTFPR CT"
+
+    In it is contained a set of methods for interfacing the efeitos.c library of effects and preset binary files.
+    By which we may write files structured in such a way that whe main code can autonomously allocate the 
+    resources required so the audio processing can advance as intended.
+    -------------------------------------------------------------------------------------------------------------- */
+
 #include "interface.h"
 #include "efeitos.h"
 

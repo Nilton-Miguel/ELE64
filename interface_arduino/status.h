@@ -38,7 +38,6 @@ enum SCREEN_STATE
 #define MACRO_NOTCH         0x8
 
 // ---------------------------------------------------------------------------------
-
 class Efeito
 {
 private:
@@ -56,9 +55,7 @@ public:
   char  recuperarID();
   float recuperarParametro(int indice);
 };
-
 // ---------------------------------------------------------------------------------
-
 class Status
 {
 private:
@@ -77,19 +74,6 @@ private:
   int           STEP_SIZE;
   volatile int  ENCODER_PULSE_COUNTER;
   int           ACTIVITY;
-
-  /*
-    INTERFACE_STATE             - qual o estado atual da maquina
-    INTERFACE_CURSOR_POSITION   - qual dos elementos da tela está emhighlight no momento
-    PAGINA_VIRTUAL              - qual pagina está sendo mostrada (para telas multi pagina)
-    ACTIVE_PRESET_FILE          - qual o indice do arquivo preset sendo lido ou editado
-    ACTIVE_EFFECT               - qual dos 3 efeitos está sendo editado
-    ACTIVE_PARAM                - qual dos 4 parametros está sendo editado
-    EDIT_AUX                    - buffer para guardar as alterações no parametro antes de serem efetivadas
-    STEP_SIZE                   - estado que guarda se queremos passos pequenos ou grandes
-    ENCODER_PULSE_COUNTER       - contador interno de passos do encoder que é atualizado por uma chamada em handler ISR externo
-    ACTIVITY                    - flag para monitorar atividades que fazem valer a pena atualizar a tela
-  */
 
   // amounts
   int       AMOUNT_PRESETS;
@@ -137,38 +121,38 @@ public:
   // geradora de instância
   Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_encoder_sw);
 
-  // essas funções vão ser aposentadas no projeto final
-  void  printStatus();
-  void  printEfeito(int indice);
-
-  // precisa ser chamadas todo ciclo do loop externo
+  // precisa ser chamada todo ciclo do loop externo
   void  updateStatus();
-  // ---------------------------------------------------------------------------------
+
   // manipulação do encoder, chamada no handler da interrupção
   void  decrementarEncoderPulseCounter();
   void  incrementarEncoderPulseCounter();
 
-  // usar para saber quando atualizar a tela
+  // flag que monitora quando é relevante atualizar a tela
   int   getActivity();
 
-  // ler os atributos privados da máquina de estados
+  // ler os atributos privados da máquina de estados --------------------------------
   SCREEN_STATE  getInterfaceState();
+
   int           getCursorPosition();
   int           getPaginaVirtual();
+
   int           getActivePreset();
   int           getActiveEffect();
   int           getActiveParam();
 
-  // IO com os arquivos
+  // usadas para desenhar na tela os valores enquanto estão sendo editados no buffer
+  Efeito**      getPresetBuffer();
+  float         getEditAux();
 
-  // talvez IO de arquivos com ponteiros aqui, mas daí pra mostrar na tela na hora da edição não temos acesso
-  void          dumpBufferInternoToFile();
-  void          dumpFileToBufferInterno();
+  // FUNÇÕES QUE AINDA PRECISAM DE IMPLEMENTAÇÃO (JOÃO) -----------------------------
 
-  // talvez funções individuais pra recuperar os efeitos, ou talvez tentar fazer dar certo retornar o vetor completo.
-  Efeito        getEfeito0();
-  Efeito        getEfeito1();
-  Efeito        getEfeito2();
+  // IO de arquivo (vão precisar de um ponteiro para os arquivos de preset)
+  void          burnFileToBuffer(); // precisa de um ponteiro para arquivo aberto em leitura
+  void          burnBufferToFile(); // precisa de um ponteiro para arquivo aberto em escrita
+
+  // Leitura da folder de presets pra contar quantos já existem na inicialização
+  int          readFolderPresetAmount();
   // ---------------------------------------------------------------------------------
 };
 

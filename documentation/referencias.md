@@ -1,6 +1,7 @@
-Este Documento guarda um compilado de referências usadas ao longo do desenvolvimento desta biblioteca
 
-This Document stores a compilation of references used during the development of this Library
+Este Documento guarda um compilado de referências usadas ao longo do desenvolvimento dessas bibliotecas
+
+This Document stores a compilation of references used during the development of these libraries
 
 # Links
 
@@ -40,7 +41,7 @@ lfilter](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lfilt
 [Linear phase](https://en.wikipedia.org/wiki/Linear_phase)
 
 [The Scientist and Engineer's Guide to
-Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
+Digital Signal Processing](https://www.dspguide.com/pdfbook.html)
 
 [libsndfile](http://www.mega-nerd.com/libsndfile/api.html)
 
@@ -78,3 +79,8 @@ Digital Signal Processing](https://www.dspguide.com/pdfbook.htm)
 
 [Biblioteca C - função fwrite()](https://www-tutorialspoint-com.translate.goog/c_standard_library/c_function_fwrite.htm?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc)
 
+[Double pointer vs array of pointers(**array vs *array[])](https://stackoverflow.com/questions/33746434/double-pointer-vs-array-of-pointersarray-vs-array)
+
+[What is your way to go for state machines in C++? ](https://www.reddit.com/r/embedded/comments/10o3i2x/what_is_your_way_to_go_for_state_machines_in_c/?share_id=EmGbyda8ZKK5CW_koYW_t&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=3)
+
+[Why make class members private?](https://stackoverflow.com/questions/24661886/why-make-class-members-private)

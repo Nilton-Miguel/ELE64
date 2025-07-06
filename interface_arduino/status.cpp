@@ -1,4 +1,27 @@
 
+/*  --------------------------------------------------------------------------------------------------------------
+
+    autor: Nilton Miguel Guimaraes de Souza
+    info:  Brasil Parana Curitiba 01/07/2025
+
+    Esta biblioteca foi desenvolvida para fins academicos na disciplina "ELE64 - Oficina de Integracao UTFPR CT"
+
+    Nesta biblioteca consta um conjunto de metodos para experiencia de usuario, como tratamento de pressionamento 
+    de botoes, interacao com encoder rotativo e navegacao. Todos esses inputs coordenam uma maquina de estados 
+    escrita em forma de classe que fornece acesso aos seus atributos privados por intermedio de uma interface
+    publica muito eficiente.
+    --------------------------------------------------------------------------------------------------------------
+
+    author: Nilton Miguel Guimaraes de Souza
+    info:   Brasil Parana Curitiba 23/05/2025
+
+    This library was developed with academic objectives for the course "ELE64 - Oficina de Integracao UTFPR CT"
+
+    In it is contained a set of methods for user experience, such as treating of button pressing, interaction via
+    rotary encoder and navigation. All these inputs control a finite state machine written as a Class that gives
+    access to its private attributes by means of a efficient public interface.
+    -------------------------------------------------------------------------------------------------------------- */
+
 #include "status.h"
 
 // ---------------------------------------------------------------------------------
@@ -10,27 +33,22 @@ Efeito::Efeito()
   for(j=0; j<4; j++) parametro[j] = 0;
 }
 // ---------------------------------------------------------------------------------
-
 void Efeito::alterarID(char novo_ID)
 {
   ID = novo_ID;
 }
-
 void Efeito::alterarParametro(int indice, float novo_valor)
 {
   parametro[indice] = novo_valor;
 }
-
 char Efeito::recuperarID()
 {
   return ID;
 }
-
 float Efeito::recuperarParametro(int indice)
 {
   return parametro[indice];
 }
-
 // ---------------------------------------------------------------------------------
 Status::Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_encoder_sw)
 {
@@ -48,7 +66,7 @@ Status::Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_
   INTERFACE_CURSOR_POSITION = 0;
   PAGINA_VIRTUAL = 0;
 
-  AMOUNT_PRESETS = EXISTING_PRESETS;
+  AMOUNT_PRESETS = readFolderPresetAmount();
 
   ACTIVE_PRESET_FILE = 0;
   ACTIVE_EFFECT = 0;
@@ -69,97 +87,8 @@ Status::Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_
     PRESET[j] = new Efeito();
   }
 }
+
 // ---------------------------------------------------------------------------------
-
-void Status::printStatus()
-{
-
-  // atributos internos ----------------------------------
-
-  Serial.print("|ESTADO| 0x");
-  Serial.print(INTERFACE_STATE);
-
-  //Serial.print(" BUT_A: ");
-  //Serial.print(NEW_STATUS_BUT_A);
-
-  //Serial.print(" BUT_B: ");
-  //Serial.print(NEW_STATUS_BUT_B);
-
-  //Serial.print(" DIFFA: ");
-  //Serial.print(getDifferenceButA());
-
-  //Serial.print(" DIFFB: ");
-  //Serial.print(getDifferenceButB());
-
-  Serial.print(" |CURSOR| 0x");
-  Serial.print(INTERFACE_CURSOR_POSITION);
-
-  Serial.print(" |VPAGE| 0x");
-  Serial.print(PAGINA_VIRTUAL);
-
-  Serial.print(" |PRESET| 0x");
-  Serial.print(ACTIVE_PRESET_FILE);
-
-  Serial.print(" |FX| 0x");
-  Serial.print(ACTIVE_EFFECT);
-
-  //Serial.print(" |ENCODER COUNTER| ");
-  //Serial.print(ENCODER_PULSE_COUNTER);
-
-  // eventos --------------------------------------------
-
-  if(getDifferenceButA() && NEW_STATUS_BUT_A == 0)                      Serial.print("|A PRESSED|");
-  else if(getDifferenceButB() && NEW_STATUS_BUT_B == 0)                 Serial.print("|B PRESSED|");
-  else if(getDifferenceEncoderSwitch() && NEW_STATUS_ENCODER_SW == 1)   Serial.print("|ENC PRESSED|");
-  else if(getCursorUp())                                                Serial.print("|CURSOR UP|");
-  else if(getCursorDown())                                              Serial.print("|CURSOR DOWN|");
-
-  Serial.println();
-}
-
-void  Status::printEfeito(int indice)
-{
-
-  Serial.print("FX ");
-  Serial.print(indice);
-
-  Serial.print(" |AFX| 0x");
-  Serial.print(ACTIVE_EFFECT);
-
-  if((0 == INTERFACE_CURSOR_POSITION) && INTERFACE_STATE == FX_EDIT)
-    {
-      Serial.print(" >> ");
-    }
-  Serial.print(" ID: ");
-  Serial.print((int)(PRESET[indice] -> recuperarID()));
-  Serial.print(" PR : ");
-
-  int j;
-  for(j=0; j<4; j++)
-  {
-    if((j + 1 == INTERFACE_CURSOR_POSITION) && INTERFACE_STATE == FX_EDIT)
-    {
-      Serial.print(" >> ");
-    }
-    Serial.print(PRESET[indice] -> recuperarParametro(j));
-    Serial.print("   ");
-  }
-
-  Serial.print(" |ST| 0x");
-  Serial.print(INTERFACE_STATE);
-
-  Serial.print("|OPTION| 0x");
-  Serial.print(5*PAGINA_VIRTUAL + INTERFACE_CURSOR_POSITION);
-
-  Serial.print(" |PR| 0x");
-  Serial.print(ACTIVE_PARAM);
-
-  Serial.print(" |AUX| ");
-  Serial.print(EDIT_AUX);
-
-  Serial.println();
-}
-
 void Status::zerarPreset()
 {
   int i, j;
@@ -1289,4 +1218,24 @@ int Status::getActiveEffect()
 int Status::getActiveParam()
 {
   return ACTIVE_PARAM;
+}
+Efeito** Status::getPresetBuffer()
+{
+  return PRESET;
+}
+float Status::getEditAux()
+{
+  return EDIT_AUX;
+}
+void Status::burnFileToBuffer()
+{
+
+}
+void Status::burnBufferToFile()
+{
+
+}
+int Status::readFolderPresetAmount()
+{
+  return EXISTING_PRESETS;
 }
