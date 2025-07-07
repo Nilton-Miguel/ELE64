@@ -4,6 +4,7 @@
 //#include <Arduino.h>
 #include <wiringPi.h>
 #include <cstdio>
+#include <cstdlib>
 #include <string>
 
 #define EXISTING_PRESETS            0

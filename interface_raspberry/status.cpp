@@ -194,6 +194,7 @@ void Status::inputHandler()
             INTERFACE_STATE = PROCESSING;
             INTERFACE_CURSOR_POSITION = 0;
             PAGINA_VIRTUAL = 0;
+            system("sudo systemctl restart procoffee@A.service");
           break;
    
           case 1:
@@ -226,6 +227,8 @@ void Status::inputHandler()
         INTERFACE_STATE = HUB_MENU;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
+        
+        system("sudo systemctl stop procoffee@A.service");
         break;
 
       case FX_EDIT:
@@ -311,6 +314,8 @@ void Status::inputHandler()
         INTERFACE_STATE = PRESET_EDIT;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
+        
+        system("sudo systemctl restart procoffee@A.service");
         break;
 
       case FX_EDIT:
@@ -1121,6 +1126,7 @@ void Status::inputHandler()
         INTERFACE_STATE = PROCESSING;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
+        system("sudo systemctl restart procoffee@A.service");
         break;
 
       case PRESET_DEL: 
@@ -1143,6 +1149,9 @@ void Status::inputHandler()
         INTERFACE_STATE = PROCESSING;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
+
+        system("sudo systemctl restart procoffee@A.service");
+
         break;
 
       case PROCESSING: 
