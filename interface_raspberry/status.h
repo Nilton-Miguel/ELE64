@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <string>
 
-#define EXISTING_PRESETS            0
+#define EXISTING_PRESETS            2
 
 #define ENCODER_DEBOUNCE            5
 #define ENCODER_COUNTER_THRESHOLD   5
