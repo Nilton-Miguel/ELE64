@@ -194,7 +194,7 @@ void Status::inputHandler()
             INTERFACE_STATE = PROCESSING;
             INTERFACE_CURSOR_POSITION = 0;
             PAGINA_VIRTUAL = 0;
-            system("sudo systemctl restart procoffee@A.service");
+            startProcessing();
           break;
    
           case 1:
@@ -227,8 +227,7 @@ void Status::inputHandler()
         INTERFACE_STATE = HUB_MENU;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
-        
-        system("sudo systemctl stop procoffee@A.service");
+        stopProcessing();
         break;
 
       case FX_EDIT:
@@ -315,7 +314,7 @@ void Status::inputHandler()
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
         
-        system("sudo systemctl restart procoffee@A.service");
+        stopProcessing();
         break;
 
       case FX_EDIT:
@@ -1126,7 +1125,7 @@ void Status::inputHandler()
         INTERFACE_STATE = PROCESSING;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
-        system("sudo systemctl restart procoffee@A.service");
+        startProcessing();
         break;
 
       case PRESET_DEL: 
@@ -1150,7 +1149,7 @@ void Status::inputHandler()
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
 
-        system("sudo systemctl restart procoffee@A.service");
+        startProcessing();
 
         break;
 
@@ -1291,4 +1290,18 @@ void Status::burnBufferToFile()
 int Status::readFolderPresetAmount()
 {
   return EXISTING_PRESETS;
+}
+void Status::startProcessing()
+{
+  std::string comando = "sudo systemctl restart procoffee@";
+  comando += ('A' + ACTIVE_PRESET_FILE);
+  comando += ".service";
+  system(comando.c_str());
+}
+void Status::stopProcessing()
+{
+  std::string comando = "sudo systemctl stop procoffee@";
+  comando += ('A' + ACTIVE_PRESET_FILE);
+  comando += ".service";
+  system(comando.c_str());
 }

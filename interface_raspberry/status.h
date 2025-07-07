@@ -117,6 +117,9 @@ private:
 
   int   getCursorUp();
   int   getCursorDown();
+
+  void startProcessing();
+  void stopProcessing();
   //-------------------------------------------------------------------------
 
 public:
