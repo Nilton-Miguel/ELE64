@@ -4,12 +4,10 @@
 #include <alsa/asoundlib.h>
 #include <sndfile.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include <errno.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 
 #define SAMPLE_RATE 48000
 #define CHANNELS 2
@@ -21,34 +19,7 @@
 #define TIME_LENGTH_SECONDS         14
 
 
-// A main recebe duas entradas, um inteiro com a quantidade de argumentos, e um ponteiro para uma string com os argumentos em si
-int main(int argc, char** argv){
-
-	// O primeiro argumento (índice 0) é sempre o comando que foi invocado para executar o programa
-	//printf("argc: %d; comando usado: %s\n", argc, argv[0]);
-
-	// getopt() itera sobre as strings recebidas e retorna todos os caracteres de opções que encontra
-	int c;
-	char *presetName = NULL;
-	while((c = getopt(argc, argv, "hp:")) != -1) {
-		switch(c) {
-			case 'h':
-				printf("Ajuda.\n");
-				return 0;
-				break;
-			case 'p':
-			 	presetName = optarg;
-				break;
-			default:
-				printf("Tente usar '%s -h' para ver a ajuda.\n", argv[0]);
-				return 1;
-		}
-	}
-	if(!presetName) {
-		printf("Nenhum arquivo de preset selecionado! Use '%s -p [preset]'\n", argv[0]);
-		return -1;
-	}
-
+int main(){
 	int retVal = 0;
 	snd_pcm_t *playbackHandle;
 	snd_pcm_t *captureHandle;
@@ -103,12 +74,8 @@ int main(int argc, char** argv){
 	inicializar_efeito(&efeitoB);
 	inicializar_efeito(&efeitoC);
 
-	printf("Abrindo preset %s...\n", presetName);
 	FILE *file_preset;
-	if((file_preset = fopen(presetName, "rb")) == NULL) {
-		fprintf(stderr, "Erro ao abrir preset: %s \n", strerror(errno));
-		return errno;
-	}
+	file_preset = fopen("preset_2.bin", "rb");
 	carregar_preset(&efeitoA, &efeitoB, &efeitoC, file_preset);
 	fclose(file_preset);
 
@@ -133,12 +100,13 @@ int main(int argc, char** argv){
 	}
 	*/
 
+	printf("Starting capture\n");
 	if((err = snd_pcm_start(captureHandle)) < 0) {
 		fprintf(stderr, "Cannot start capture: %s\n", snd_strerror(err));
 		return err;
 	}
 
-	printf("Captura iniciada. Esperando por %d frames...\n", signal_frames);
+	printf("Waiting for capture device to deliver %d frames...\n", signal_frames);
 
 	unsigned long avail = 0;
 	do {
@@ -147,7 +115,7 @@ int main(int argc, char** argv){
 	}
 	while(avail < signal_frames);
 
-	printf("Iniciando processamento!\n");
+	printf("Entering audio processing loop!\n");
 
 	// Audio processing loop
 	while(1) {
