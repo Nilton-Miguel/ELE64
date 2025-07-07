@@ -4,7 +4,7 @@
 //#include <Arduino.h>
 #include <wiringPi.h>
 
-#define EXISTING_PRESETS            17
+#define EXISTING_PRESETS            0
 
 #define ENCODER_DEBOUNCE            5
 #define ENCODER_COUNTER_THRESHOLD   5

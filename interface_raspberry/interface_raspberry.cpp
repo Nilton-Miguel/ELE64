@@ -66,40 +66,41 @@ int main() {
 
   while(1) {
 
-  if(status.getActivity())
-  {
-    // esses dados agora podem ser acessados publicamente
-    std::cout << "ESTADO: ";
-    std::cout << status.getInterfaceState();
+    if(status.getActivity())
+    {
+      // esses dados agora podem ser acessados publicamente
+      std::cout << "PRESET: ";
+      std::cout << status.getActivePreset();
 
-    std::cout << " CURSOR: ";
-    std::cout << status.getCursorPosition();
+      std::cout << " ESTADO: ";
+      std::cout << status.getInterfaceState();
 
-    std::cout << " PAGINA: ";
-    std::cout << status.getPaginaVirtual();
+      std::cout << " OPÇÃO: ";
+      std::cout << 5*status.getPaginaVirtual() + status.getCursorPosition();
 
-    std::cout << " PRESET: ";
-    std::cout << status.getActivePreset();
+      if(status.getInterfaceState() > 4) {
+        std::cout << " EFEITO: ";
+        std::cout << status.getActiveEffect();
 
-    std::cout << " EFEITO: ";
-    std::cout << status.getActiveEffect();
+        std::cout << " ID: ";
+        std::cout << (int) status.getPresetBuffer()[status.getActiveEffect()] -> recuperarID();
 
-    std::cout << " PARAM: ";
-    std::cout << status.getActiveParam();
+        std::cout << " PARAMETROS: ";
+        std::cout << status.getPresetBuffer()[status.getActiveEffect()] -> recuperarParametro(0) << " ";
+        std::cout << status.getPresetBuffer()[status.getActiveEffect()] -> recuperarParametro(1) << " ";
+        std::cout << status.getPresetBuffer()[status.getActiveEffect()] -> recuperarParametro(2) << " ";
+        std::cout << status.getPresetBuffer()[status.getActiveEffect()] -> recuperarParametro(3) << " ";
 
-    std::cout << " AUX: ";
-    std::cout << status.getEditAux();
+        std::cout << " PARAM ATIVO: ";
+        std::cout << status.getActiveParam();
 
-    std::cout << " ID FX: ";
-    std::cout << (int) status.getPresetBuffer()[0] -> recuperarID();
+        std::cout << " AUX: ";
+        std::cout << status.getEditAux();
+      }
+      std::cout << "\n";
+    }
 
-    std::cout << " PR0 FX: ";
-    std::cout << status.getPresetBuffer()[0] -> recuperarParametro(0);
-
-    std::cout << "\n";
+    status.updateStatus();
+    usleep(10000);
   }
-
-  status.updateStatus();
-  usleep(10000);
-}
 }
