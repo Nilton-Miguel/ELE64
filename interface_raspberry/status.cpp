@@ -160,8 +160,11 @@ void Status::inputHandler()
           break;
 
           default:
+
             // seleciona o preset ja existente
             ACTIVE_PRESET_FILE = 5*PAGINA_VIRTUAL + INTERFACE_CURSOR_POSITION - 1;
+
+            burnFileToBuffer();
 
             // troca o estado
             INTERFACE_STATE = HUB_MENU;
@@ -1240,6 +1243,24 @@ float Status::getEditAux()
 }
 void Status::burnFileToBuffer()
 {
+  std::string filename = "A.bin";
+  filename[0] = 'A' + ACTIVE_PRESET_FILE;
+
+  FILE *file_preset;
+  file_preset = fopen(filename.c_str(), "rb");
+  for(int i = 0; i < 3; i++) {
+    //char id = PRESET[i]->recuperarID();
+    char id;
+    fread(&id, 1, sizeof(char), file_preset);
+    PRESET[i]->alterarID(id);
+    for(int j = 0; j < 4; j++) {
+      //float param = PRESET[i]->recuperarParametro(j);
+      float param;
+      fread(&param, 1, sizeof(float), file_preset);
+      PRESET[i]->alterarParametro(j, param);
+    }
+  }
+  fclose(file_preset);
 }
 void Status::burnBufferToFile()
 {
