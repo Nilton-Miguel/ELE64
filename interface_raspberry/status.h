@@ -3,6 +3,8 @@
 
 //#include <Arduino.h>
 #include <wiringPi.h>
+#include <cstdio>
+#include <string>
 
 #define EXISTING_PRESETS            0
 

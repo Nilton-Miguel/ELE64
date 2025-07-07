@@ -153,7 +153,7 @@ void Status::inputHandler()
           case 0:
             // cria o novo preset
             AMOUNT_PRESETS++;
-            ACTIVE_PRESET_FILE = AMOUNT_PRESETS;
+            ACTIVE_PRESET_FILE = AMOUNT_PRESETS - 1;
 
             // troca o estado
             INTERFACE_STATE = PRESET_EDIT;
@@ -161,7 +161,7 @@ void Status::inputHandler()
 
           default:
             // seleciona o preset ja existente
-            ACTIVE_PRESET_FILE = 5*PAGINA_VIRTUAL + INTERFACE_CURSOR_POSITION;
+            ACTIVE_PRESET_FILE = 5*PAGINA_VIRTUAL + INTERFACE_CURSOR_POSITION - 1;
 
             // troca o estado
             INTERFACE_STATE = HUB_MENU;
@@ -280,6 +280,7 @@ void Status::inputHandler()
 
       case PRESET_EDIT:
 
+        burnBufferToFile();
         INTERFACE_STATE = HUB_MENU;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
@@ -1113,7 +1114,7 @@ void Status::inputHandler()
         break;
 
       case PRESET_EDIT:
-
+        burnBufferToFile();
         INTERFACE_STATE = PROCESSING;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
@@ -1121,6 +1122,7 @@ void Status::inputHandler()
 
       case PRESET_DEL: 
 
+        /*
         // deleta o preset ativo atualmente
         AMOUNT_PRESETS--;
 
@@ -1130,6 +1132,7 @@ void Status::inputHandler()
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
         ACTIVE_PRESET_FILE = 0;
+        */
         break;
 
       case HUB_MENU:
@@ -1237,11 +1240,23 @@ float Status::getEditAux()
 }
 void Status::burnFileToBuffer()
 {
-
 }
 void Status::burnBufferToFile()
 {
+  std::string filename = "A.bin";
+  filename[0] = 'A' + ACTIVE_PRESET_FILE;
 
+  FILE *file_preset;
+  file_preset = fopen(filename.c_str(), "wb");
+  for(int i = 0; i < 3; i++) {
+    char id = PRESET[i]->recuperarID();
+    fwrite(&id, 1, sizeof(char), file_preset);
+    for(int j = 0; j < 4; j++) {
+      float param = PRESET[i]->recuperarParametro(j);
+      fwrite(&param, 1, sizeof(float), file_preset);
+    }
+  }
+  fclose(file_preset);
 }
 int Status::readFolderPresetAmount()
 {
