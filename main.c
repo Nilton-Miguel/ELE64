@@ -55,11 +55,11 @@ int main(int argc, char** argv){
 	int err = 0;
 
 	// Open PCM device for capture/playback
-	if((err = snd_pcm_open(&playbackHandle, "plughw:1,0", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+	if((err = snd_pcm_open(&playbackHandle, "plughw:0,0", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
 		fprintf(stderr, "Cannot open playback device: %s\n", snd_strerror(err));
 		return err;
 	}
-	if((err = snd_pcm_open(&captureHandle, "plughw:1,1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
+	if((err = snd_pcm_open(&captureHandle, "plughw:0,1", SND_PCM_STREAM_CAPTURE, 0)) < 0) {
 		fprintf(stderr, "Cannot open capture device: %s\n", snd_strerror(err));
 		return err;
 	}
