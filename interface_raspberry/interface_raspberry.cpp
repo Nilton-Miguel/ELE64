@@ -75,13 +75,28 @@ int main() {
   ctx = cairo_create(sfc);
 
 
-  cairo_surface_t *img;
-  img = cairo_image_surface_create_from_png("/home/raspberrypi/DEL_ONLY.png");
-  display_img(ctx, sfc, img);
+
+  cairo_surface_t *img_del;
+  img_del = cairo_image_surface_create_from_png("/home/raspberrypi/DEL_ONLY.png");
+  cairo_surface_t *img_proc;
+  img_proc = cairo_image_surface_create_from_png("/home/raspberrypi/PROC_ONLY.png");
+	cairo_surface_t *img_hub[4];
+	img_hub[0] = cairo_image_surface_create_from_png("/home/raspberrypi/USAR_NON.png");
+	img_hub[1] = cairo_image_surface_create_from_png("/home/raspberrypi/TROCAR_NON.png");
+	img_hub[2] = cairo_image_surface_create_from_png("/home/raspberrypi/UDITSAR_NON.png");
+	img_hub[3] = cairo_image_surface_create_from_png("/home/raspberrypi/DEL_NON.png");
+	cairo_surface_t *img_sel[4];
+	img_sel[0] = cairo_image_surface_create_from_png("/home/raspberrypi/USAR_SEL.png");
+	img_sel[1] = cairo_image_surface_create_from_png("/home/raspberrypi/TROCAR_SEL.png");
+	img_sel[2] = cairo_image_surface_create_from_png("/home/raspberrypi/UDITSAR_SEL.png");
+	img_sel[3] = cairo_image_surface_create_from_png("/home/raspberrypi/DEL_SEL.png");
+
+
 
   bool running = true;
   while(running) {
 
+    /*
     if(myStatus.getActivity())
     {
       // esses dados agora podem ser acessados publicamente
@@ -115,6 +130,34 @@ int main() {
       }
       std::cout << "\n";
     }
+    */
+  if(myStatus.getActivity()) {
+    switch(myStatus.getInterfaceState()) {
+      default:
+      case PRESET_DEL:
+        cairo_push_group(ctx);
+        display_img(ctx, img_del, 0, 0);
+	      cairo_pop_group_to_source(ctx);
+	      cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
+      case HUB_MENU:
+	      cairo_push_group(ctx);
+        display_hub(ctx, img_hub, img_sel, myStatus.getOption());
+	      cairo_pop_group_to_source(ctx);
+	      cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
+      case PROCESSING:
+        cairo_push_group(ctx);
+        display_img(ctx, img_proc, 0, 0);
+	      cairo_pop_group_to_source(ctx);
+	      cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
+
+    }
+  }
 
     switch(cairo_check_event(sfc, 0)) {
       case 0xff1b:  // Esc no teclado
