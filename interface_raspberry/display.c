@@ -101,3 +101,13 @@ void display_img(cairo_t *ctx, cairo_surface_t *img, int pos_x, int pos_y) {
 	cairo_set_source_surface(ctx, img, pos_x, pos_y);
    cairo_fill(ctx);
 }
+
+void display_hub(cairo_t *ctx, cairo_surface_t **img_hub, cairo_surface_t **img_sel, int sel) {
+   display_img(ctx, img_hub[0], 0, 0);
+   display_img(ctx, img_hub[1], 159, 0);
+   display_img(ctx, img_hub[2], 0, 119);
+   display_img(ctx, img_hub[3], 159, 119);
+   int sel_pos_x = (sel % 2) * 159;
+   int sel_pos_y = (sel / 2) * 119;
+   display_img(ctx, img_sel[sel], sel_pos_x, sel_pos_y);
+}

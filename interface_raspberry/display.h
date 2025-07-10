@@ -18,6 +18,6 @@ cairo_surface_t *cairo_create_x11_surface(int *x, int *y);
 void cairo_close_x11_surface(cairo_surface_t *sfc);
 
 void display_img(cairo_t *ctx, cairo_surface_t *img, int pos_x, int pos_y);
-
+void display_hub(cairo_t *ctx, cairo_surface_t **img_hub, cairo_surface_t **img_sel, int sel);
 
 #endif
