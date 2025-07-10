@@ -1229,6 +1229,10 @@ int StatusClass::getPaginaVirtual()
 {
   return PAGINA_VIRTUAL;
 }
+int StatusClass::getOption()
+{
+  return 5*PAGINA_VIRTUAL + INTERFACE_CURSOR_POSITION;
+}
 int StatusClass::getActivePreset()
 {
   return ACTIVE_PRESET_FILE;

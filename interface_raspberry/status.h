@@ -143,6 +143,7 @@ public:
 
   int           getCursorPosition();
   int           getPaginaVirtual();
+  int           getOption();
 
   int           getActivePreset();
   int           getActiveEffect();
