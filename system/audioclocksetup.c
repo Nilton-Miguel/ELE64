@@ -87,16 +87,21 @@ void reset_gpio(int pin) {
 */
 
 int main() {
-    // Toggle GPIO pin 3
-    const int pin = 3;
     printf("Configuring clock.\n");
 
     setup_gpclk();
 
-    gpclk[GPCLK0_CTRL] = 0x5a000227;
-    gpclk[GPCLK0_DIV] = 0x5a008ca0;
-    gpclk[GPCLK0_CTRL] = 0x5a000217;
+    // Matar o gerador de clock
+    gpclk[GPCLK0_CTRL] = 0x5A000020;
+    // Configurar o divisor como 8,7891 = 8 + 3232 / 4096
+    // assim, parte inteira 8 (0x008) e parte fracionária 3232 (0xCA0)
+    gpclk[GPCLK0_DIV] = 0x5A008CA0;
+    // Rodar gerador com divisor MASH de 2 estágios, a partir do sinal HDMI auxiliary (216 MHz)
+    gpclk[GPCLK0_CTRL] = 0x5A000217;
 
+    // Após a configuração, teremos um clock de 216 / 8,7891 = 24,576 MHz em GPCLK0
+
+    // Configurar o pino GPIO4 como função alternativa (para que assuma o sinal GPCLK0)
     gpio[0] = (0b100 << 12);
 
     printf("Clock configured.\n");
