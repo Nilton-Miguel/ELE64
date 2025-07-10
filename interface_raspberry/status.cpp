@@ -1296,12 +1296,12 @@ void StatusClass::startProcessing()
   std::string comando = "sudo systemctl restart procoffee@";
   comando += ('A' + ACTIVE_PRESET_FILE);
   comando += ".service";
-  system(comando.c_str());
+  //system(comando.c_str());
 }
 void StatusClass::stopProcessing()
 {
   std::string comando = "sudo systemctl stop procoffee@";
   comando += ('A' + ACTIVE_PRESET_FILE);
   comando += ".service";
-  system(comando.c_str());
+  //system(comando.c_str());
 }
