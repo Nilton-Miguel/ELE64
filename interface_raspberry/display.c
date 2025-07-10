@@ -94,11 +94,10 @@ void cairo_close_x11_surface(cairo_surface_t *sfc)
    XCloseDisplay(dsp);
 }
 
-void display_img(cairo_t *ctx, cairo_surface_t *sfc, cairo_surface_t *img) {
-	cairo_push_group(ctx);
-	cairo_set_source_surface(ctx, img, 0, 0);
-   cairo_paint(ctx);
-	cairo_pop_group_to_source(ctx);
-	cairo_paint(ctx);
-   cairo_surface_flush(sfc);
+void display_img(cairo_t *ctx, cairo_surface_t *img, int pos_x, int pos_y) {
+   int width = cairo_image_surface_get_width(img);
+   int height = cairo_image_surface_get_height(img);
+	cairo_rectangle(ctx, pos_x, pos_y, width, height);
+	cairo_set_source_surface(ctx, img, pos_x, pos_y);
+   cairo_fill(ctx);
 }
