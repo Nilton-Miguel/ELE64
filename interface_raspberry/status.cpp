@@ -50,7 +50,7 @@ float Efeito::recuperarParametro(int indice)
   return parametro[indice];
 }
 // ---------------------------------------------------------------------------------
-Status::Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_encoder_sw)
+StatusClass::StatusClass(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_encoder_sw)
 {
   // acesso aos pinos físios
   PIN_BUT_A =       pin_but_a;
@@ -97,7 +97,7 @@ Status::Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_
 }
 
 // ---------------------------------------------------------------------------------
-void Status::zerarPreset()
+void StatusClass::zerarPreset()
 {
   int i, j;
   for(i=0; i<3; i++)
@@ -110,7 +110,7 @@ void Status::zerarPreset()
   }
 }
 
-void Status::zerarEfeito(int indice)
+void StatusClass::zerarEfeito(int indice)
 {
   
   PRESET[indice] -> alterarID(0);
@@ -122,7 +122,7 @@ void Status::zerarEfeito(int indice)
   }
 }
 
-void Status::updateStatus()
+void StatusClass::updateStatus()
 {
   OLD_STATUS_BUT_A =      NEW_STATUS_BUT_A;
   OLD_STATUS_BUT_B =      NEW_STATUS_BUT_B;
@@ -135,7 +135,7 @@ void Status::updateStatus()
   inputHandler();
 }
 
-void Status::inputHandler()
+void StatusClass::inputHandler()
 {
 
   ACTIVITY = 0;
@@ -1175,29 +1175,29 @@ void Status::inputHandler()
   }
 }
 
-int Status::getDifferenceButA()
+int StatusClass::getDifferenceButA()
 {
   return ((OLD_STATUS_BUT_A != NEW_STATUS_BUT_A));
 }
-int Status::getDifferenceButB()
+int StatusClass::getDifferenceButB()
 {
   return ((OLD_STATUS_BUT_B != NEW_STATUS_BUT_B));
 }
-int Status::getDifferenceEncoderSwitch()
+int StatusClass::getDifferenceEncoderSwitch()
 {
   return ((OLD_STATUS_ENCODER_SW != NEW_STATUS_ENCODER_SW));
 }
-void Status::incrementarEncoderPulseCounter()
+void StatusClass::incrementarEncoderPulseCounter()
 {
   //if(ENCODER_PULSE_COUNTER < 0) ENCODER_PULSE_COUNTER = 0;
   ENCODER_PULSE_COUNTER++;
 }
-void Status::decrementarEncoderPulseCounter()
+void StatusClass::decrementarEncoderPulseCounter()
 {
   //if(ENCODER_PULSE_COUNTER > 0) ENCODER_PULSE_COUNTER = 0;
   ENCODER_PULSE_COUNTER--;
 }
-int Status::getCursorUp()
+int StatusClass::getCursorUp()
 {
   if(ENCODER_PULSE_COUNTER > ENCODER_COUNTER_THRESHOLD) 
   { 
@@ -1205,7 +1205,7 @@ int Status::getCursorUp()
   }
   else return 0;
 }
-int Status::getCursorDown()
+int StatusClass::getCursorDown()
 {
   if(ENCODER_PULSE_COUNTER < -ENCODER_COUNTER_THRESHOLD)
   {
@@ -1213,43 +1213,43 @@ int Status::getCursorDown()
   }
   else return 0;
 }
-int Status::getActivity()
+int StatusClass::getActivity()
 {
   return ACTIVITY;
 }
-SCREEN_STATE Status::getInterfaceState()
+SCREEN_STATE StatusClass::getInterfaceState()
 {
   return INTERFACE_STATE;
 }
-int Status::getCursorPosition()
+int StatusClass::getCursorPosition()
 {
   return INTERFACE_CURSOR_POSITION;
 }
-int Status::getPaginaVirtual()
+int StatusClass::getPaginaVirtual()
 {
   return PAGINA_VIRTUAL;
 }
-int Status::getActivePreset()
+int StatusClass::getActivePreset()
 {
   return ACTIVE_PRESET_FILE;
 }
-int Status::getActiveEffect()
+int StatusClass::getActiveEffect()
 {
   return ACTIVE_EFFECT;
 }
-int Status::getActiveParam()
+int StatusClass::getActiveParam()
 {
   return ACTIVE_PARAM;
 }
-Efeito** Status::getPresetBuffer()
+Efeito** StatusClass::getPresetBuffer()
 {
   return PRESET;
 }
-float Status::getEditAux()
+float StatusClass::getEditAux()
 {
   return EDIT_AUX;
 }
-void Status::burnFileToBuffer()
+void StatusClass::burnFileToBuffer()
 {
   std::string filename = "A.bin";
   filename[0] = 'A' + ACTIVE_PRESET_FILE;
@@ -1270,7 +1270,7 @@ void Status::burnFileToBuffer()
   }
   fclose(file_preset);
 }
-void Status::burnBufferToFile()
+void StatusClass::burnBufferToFile()
 {
   std::string filename = "A.bin";
   filename[0] = 'A' + ACTIVE_PRESET_FILE;
@@ -1287,18 +1287,18 @@ void Status::burnBufferToFile()
   }
   fclose(file_preset);
 }
-int Status::readFolderPresetAmount()
+int StatusClass::readFolderPresetAmount()
 {
   return EXISTING_PRESETS;
 }
-void Status::startProcessing()
+void StatusClass::startProcessing()
 {
   std::string comando = "sudo systemctl restart procoffee@";
   comando += ('A' + ACTIVE_PRESET_FILE);
   comando += ".service";
   system(comando.c_str());
 }
-void Status::stopProcessing()
+void StatusClass::stopProcessing()
 {
   std::string comando = "sudo systemctl stop procoffee@";
   comando += ('A' + ACTIVE_PRESET_FILE);

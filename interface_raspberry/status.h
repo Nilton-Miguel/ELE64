@@ -60,7 +60,7 @@ public:
   float recuperarParametro(int indice);
 };
 // ---------------------------------------------------------------------------------
-class Status
+class StatusClass
 {
 private:
 
@@ -126,7 +126,7 @@ public:
 
   // ---------------------------------------------------------------------------------
   // geradora de instância
-  Status(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_encoder_sw);
+  StatusClass(int pin_but_a, int pin_but_b, int pin_data, int pin_clk, int pin_encoder_sw);
 
   // precisa ser chamada todo ciclo do loop externo
   void  updateStatus();
