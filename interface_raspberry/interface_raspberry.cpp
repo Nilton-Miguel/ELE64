@@ -75,6 +75,8 @@ int main() {
   ctx = cairo_create(sfc);
 
 
+  cairo_select_font_face(ctx, "Georgia", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(ctx, 24.0);
 
   cairo_surface_t *img_del;
   img_del = cairo_image_surface_create_from_png("/home/raspberrypi/DEL_ONLY.png");
@@ -134,6 +136,13 @@ int main() {
   if(myStatus.getActivity()) {
     switch(myStatus.getInterfaceState()) {
       default:
+      case PRESET_SELECT:
+        cairo_push_group(ctx);
+        display_sel_screen(ctx, myStatus.getAmountPresets(), myStatus.getPaginaVirtual(), myStatus.getCursorPosition());
+        cairo_pop_group_to_source(ctx);
+        cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
       case PRESET_DEL:
         cairo_push_group(ctx);
         display_img(ctx, img_del, 0, 0);
