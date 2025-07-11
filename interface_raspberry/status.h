@@ -117,9 +117,6 @@ private:
 
   int   getCursorUp();
   int   getCursorDown();
-
-  void startProcessing();
-  void stopProcessing();
   //-------------------------------------------------------------------------
 
 public:
@@ -162,6 +159,9 @@ public:
 
   // Leitura da folder de presets pra contar quantos já existem na inicialização
   int          readFolderPresetAmount();
+
+  void startProcessing();
+  void stopProcessing();
   // ---------------------------------------------------------------------------------
 };
 

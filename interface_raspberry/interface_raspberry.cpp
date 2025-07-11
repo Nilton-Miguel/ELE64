@@ -163,6 +163,8 @@ int main() {
 	      cairo_pop_group_to_source(ctx);
 	      cairo_paint(ctx);
         cairo_surface_flush(sfc);
+        cairo_check_event(sfc, 0);
+        myStatus.startProcessing();
         break;
 
     }
@@ -177,7 +179,7 @@ int main() {
     }
 
     myStatus.updateStatus();
-    usleep(10000);
+    usleep(100000);
   }
 
   cairo_destroy(ctx);

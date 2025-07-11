@@ -194,7 +194,6 @@ void StatusClass::inputHandler()
             INTERFACE_STATE = PROCESSING;
             INTERFACE_CURSOR_POSITION = 0;
             PAGINA_VIRTUAL = 0;
-            startProcessing();
           break;
    
           case 1:
@@ -1125,7 +1124,6 @@ void StatusClass::inputHandler()
         INTERFACE_STATE = PROCESSING;
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
-        startProcessing();
         break;
 
       case PRESET_DEL: 
@@ -1149,7 +1147,6 @@ void StatusClass::inputHandler()
         INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
 
-        startProcessing();
 
         break;
 
@@ -1304,12 +1301,13 @@ void StatusClass::startProcessing()
   std::string comando = "sudo systemctl restart procoffee@";
   comando += ('A' + ACTIVE_PRESET_FILE);
   comando += ".service";
-  //system(comando.c_str());
+  system(comando.c_str());
 }
 void StatusClass::stopProcessing()
 {
   std::string comando = "sudo systemctl stop procoffee@";
   comando += ('A' + ACTIVE_PRESET_FILE);
   comando += ".service";
-  //system(comando.c_str());
+  system(comando.c_str());
+  system("sudo systemctl restart fbcp-ili9341.service");
 }
