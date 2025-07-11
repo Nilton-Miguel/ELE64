@@ -145,6 +145,7 @@ public:
   int           getPaginaVirtual();
   int           getOption();
 
+  int           getAmountPresets();
   int           getActivePreset();
   int           getActiveEffect();
   int           getActiveParam();
