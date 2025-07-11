@@ -143,6 +143,13 @@ int main() {
         cairo_paint(ctx);
         cairo_surface_flush(sfc);
         break;
+      case PRESET_EDIT:
+        cairo_push_group(ctx);
+        display_preset_edit_screen(ctx, myStatus.getCursorPosition());
+        cairo_pop_group_to_source(ctx);
+        cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
       case PRESET_DEL:
         cairo_push_group(ctx);
         display_img(ctx, img_del, 0, 0);
@@ -166,7 +173,52 @@ int main() {
         cairo_check_event(sfc, 0);
         myStatus.startProcessing();
         break;
-
+      case FX_EDIT: {
+        cairo_push_group(ctx);
+        Efeito *meuEfeito = myStatus.getPresetBuffer()[myStatus.getActiveEffect()];
+        char fxLabel = meuEfeito->recuperarID();
+        float fxParam[4];
+        for(int i = 0; i < 4; i++) {
+          fxParam[i] = meuEfeito->recuperarParametro(i);
+        }
+        display_fx_screen(ctx, fxLabel, fxParam, myStatus.getCursorPosition());
+        cairo_pop_group_to_source(ctx);
+        cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
+      }
+      case FX_ID_CHANGE: {
+        cairo_push_group(ctx);
+        Efeito *meuEfeito = myStatus.getPresetBuffer()[myStatus.getActiveEffect()];
+        char fxLabel = (char)myStatus.getEditAux();
+        float fxParam[4];
+        for(int i = 0; i < 4; i++) {
+          fxParam[i] = meuEfeito->recuperarParametro(i);
+        }
+        display_fx_screen(ctx, fxLabel, fxParam, myStatus.getCursorPosition());
+        cairo_pop_group_to_source(ctx);
+        cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
+    }
+      case FX_PARAM_EDIT: {
+        cairo_push_group(ctx);
+        Efeito *meuEfeito = myStatus.getPresetBuffer()[myStatus.getActiveEffect()];
+        char fxLabel = meuEfeito->recuperarID();
+        float fxParam[4];
+        for(int i = 0; i < 4; i++) {
+          if(i == (myStatus.getCursorPosition() - 1)) {
+            fxParam[i] = myStatus.getEditAux();
+            continue;
+          }
+          fxParam[i] = meuEfeito->recuperarParametro(i);
+        }
+        display_fx_screen(ctx, fxLabel, fxParam, myStatus.getCursorPosition());
+        cairo_pop_group_to_source(ctx);
+        cairo_paint(ctx);
+        cairo_surface_flush(sfc);
+        break;
+      }
     }
   }
 

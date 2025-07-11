@@ -246,7 +246,8 @@ void StatusClass::inputHandler()
 
             EDIT_AUX = PRESET[ACTIVE_EFFECT] -> recuperarParametro(ACTIVE_PARAM);
         }
-        INTERFACE_CURSOR_POSITION = 0;
+        // comentar esta linha para manter o cursor no parametro/id a editar
+        //INTERFACE_CURSOR_POSITION = 0;
         PAGINA_VIRTUAL = 0;
         break;
 

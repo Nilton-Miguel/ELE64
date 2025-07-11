@@ -150,3 +150,31 @@ void display_sel_screen(cairo_t *ctx, int amountPresets, int pagina, int cursor)
       ++label[0];
    }
 }
+void display_preset_edit_screen(cairo_t *ctx, int cursor) {
+   cairo_set_source_rgb(ctx, 0.0, 0.0, 0.0);
+   cairo_paint(ctx);
+
+   for(int i = 0; i < 3; i++) {
+      bool isSel = (i == cursor)? true : false;
+      char dispString[10];
+      sprintf(dispString, "Efeito %d", i + 1);
+      display_sel_button(ctx, dispString, i, isSel);
+   }
+}
+void display_fx_screen(cairo_t *ctx, char fxLabel, float fxParam[], int cursor) {
+   cairo_set_source_rgb(ctx, 0.0, 0.0, 0.0);
+   cairo_paint(ctx);
+   for(int i = 0; i < 5; i++) {
+      bool isSel = (i == cursor)? true : false;
+      if(i == 0) {
+         char fxString[2];
+         fxString[0] = '0' + fxLabel;
+         fxString[1] = '\0';
+         display_sel_button(ctx, fxString, 0, isSel);
+         continue;
+      }
+      char paramVal[10];
+      sprintf(paramVal, "%.2f", fxParam[i-1]);
+      display_sel_button(ctx, paramVal, i, isSel);
+   }
+}
