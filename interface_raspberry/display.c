@@ -111,3 +111,42 @@ void display_hub(cairo_t *ctx, cairo_surface_t **img_hub, cairo_surface_t **img_
    int sel_pos_y = (sel / 2) * 119;
    display_img(ctx, img_sel[sel], sel_pos_x, sel_pos_y);
 }
+
+void display_sel_button(cairo_t *ctx, const char *label, int pos, bool sel) {
+   int pos_box_y = pos * 48;
+   int pos_text_y = 32 + pos * 48;
+   cairo_set_source_rgb(ctx, 1.0, 1.0, 1.0);
+   if(sel) {
+      cairo_rectangle(ctx, 0, pos_box_y, 320, 48);
+      cairo_fill(ctx);
+      cairo_set_source_rgb(ctx, 0.0, 0.0, 0.0);
+   }
+   cairo_move_to(ctx, 150, pos_text_y);
+   cairo_show_text(ctx, label);
+}
+void display_sel_screen(cairo_t *ctx, int amountPresets, int pagina, int cursor) {
+   cairo_set_source_rgb(ctx, 0.0, 0.0, 0.0);
+   cairo_paint(ctx);
+
+   char label[] = "A";
+   if(pagina > 0) {
+      // Por causa do item "+" incrementamos 4 após a primeira página. Após as subsequentes incrementamos 5
+      label[0] += 4 + 5*(pagina - 1);
+   }
+
+   for(int i = 0; i < 5; i++) {
+      bool isSel = (i == cursor)? true : false;
+      // O primeiro item da primeira página é o de criar novo preset
+      if(pagina == 0 && i == 0) {
+         display_sel_button(ctx, "+", 0, isSel);
+         // não precisamos incrementar label[0] antes do próximo loop, pois o primeiro preset ("A") ainda não foi mostrado
+         continue;
+      }
+      // Só podemos mostrar presets que existem
+      if((5*pagina + i) > amountPresets) {
+         break;
+      }
+      display_sel_button(ctx, label, i % 5, isSel);
+      ++label[0];
+   }
+}
