@@ -1235,6 +1235,10 @@ int StatusClass::getAmountPresets()
 {
   return AMOUNT_PRESETS;
 }
+int StatusClass::getAmountFx()
+{
+  return AMOUNT_FX;
+}
 int StatusClass::getActivePreset()
 {
   return ACTIVE_PRESET_FILE;

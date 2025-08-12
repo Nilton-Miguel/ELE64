@@ -121,7 +121,7 @@ void display_sel_button(cairo_t *ctx, const char *label, int pos, bool sel) {
       cairo_fill(ctx);
       cairo_set_source_rgb(ctx, 0.0, 0.0, 0.0);
    }
-   cairo_move_to(ctx, 150, pos_text_y);
+   cairo_move_to(ctx, 16, pos_text_y);
    cairo_show_text(ctx, label);
 }
 void display_sel_screen(cairo_t *ctx, int amountPresets, int pagina, int cursor) {
@@ -167,14 +167,92 @@ void display_fx_screen(cairo_t *ctx, char fxLabel, float fxParam[], int cursor) 
    for(int i = 0; i < 5; i++) {
       bool isSel = (i == cursor)? true : false;
       if(i == 0) {
-         char fxString[2];
-         fxString[0] = '0' + fxLabel;
-         fxString[1] = '\0';
-         display_sel_button(ctx, fxString, 0, isSel);
+         char dispString[10];
+      switch(fxLabel) {
+         case 0:
+            sprintf(dispString, "BUFFER");
+            break;
+         case 1:
+            sprintf(dispString, "SOFT AMP");
+            break;
+         case 2:
+            sprintf(dispString, "HARD AMP");
+            break;
+         case 3:
+            sprintf(dispString, "SOFT SAT");
+            break;
+         case 4:
+            sprintf(dispString, "HARD SAT");
+            break;
+         case 5:
+            sprintf(dispString, "ECHO");
+            break;
+         case 6:
+            sprintf(dispString, "LOW PASS");
+            break;
+         case 7:
+            sprintf(dispString, "HIGH PASS");
+            break;
+         case 8:
+            sprintf(dispString, "NOTCH");
+            break;
+         default:
+            sprintf(dispString, "?");
+            break;
+      }
+         display_sel_button(ctx, dispString, 0, isSel);
          continue;
       }
       char paramVal[10];
       sprintf(paramVal, "%.2f", fxParam[i-1]);
       display_sel_button(ctx, paramVal, i, isSel);
+   }
+}
+void display_id_screen(cairo_t *ctx, int amountFxTypes, int pagina, int cursor) {
+   cairo_set_source_rgb(ctx, 0.0, 0.0, 0.0);
+   cairo_paint(ctx);
+
+   for(int i = 0; i < 5; i++) {
+      bool isSel = (i == cursor)? true : false;
+      int indice = 5*pagina + i;
+
+      // Só podemos mostrar efeitos que existem
+      if(indice >= amountFxTypes) {
+         break;
+      }
+      char dispString[10];
+      switch(indice) {
+         case 0:
+            sprintf(dispString, "BUFFER");
+            break;
+         case 1:
+            sprintf(dispString, "SOFT AMP");
+            break;
+         case 2:
+            sprintf(dispString, "HARD AMP");
+            break;
+         case 3:
+            sprintf(dispString, "SOFT SAT");
+            break;
+         case 4:
+            sprintf(dispString, "HARD SAT");
+            break;
+         case 5:
+            sprintf(dispString, "ECHO");
+            break;
+         case 6:
+            sprintf(dispString, "LOW PASS");
+            break;
+         case 7:
+            sprintf(dispString, "HIGH PASS");
+            break;
+         case 8:
+            sprintf(dispString, "NOTCH");
+            break;
+         default:
+            sprintf(dispString, "?");
+            break;
+      }
+      display_sel_button(ctx, dispString, i, isSel);
    }
 }

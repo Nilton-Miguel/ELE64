@@ -189,13 +189,7 @@ int main() {
       }
       case FX_ID_CHANGE: {
         cairo_push_group(ctx);
-        Efeito *meuEfeito = myStatus.getPresetBuffer()[myStatus.getActiveEffect()];
-        char fxLabel = (char)myStatus.getEditAux();
-        float fxParam[4];
-        for(int i = 0; i < 4; i++) {
-          fxParam[i] = meuEfeito->recuperarParametro(i);
-        }
-        display_fx_screen(ctx, fxLabel, fxParam, myStatus.getCursorPosition());
+        display_id_screen(ctx, myStatus.getAmountFx(), myStatus.getPaginaVirtual(), myStatus.getCursorPosition());
         cairo_pop_group_to_source(ctx);
         cairo_paint(ctx);
         cairo_surface_flush(sfc);

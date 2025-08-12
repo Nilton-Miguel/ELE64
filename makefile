@@ -3,6 +3,7 @@ compile:
 	gcc -c interface.c -o interface.o
 	ar rcs libprocoffee.a efeitos.o interface.o
 	gcc main.c -L. -lprocoffee -lsndfile -lm -lasound -o main
+	cp ./main ~/procoffee_processing
 
 run:
 	./main

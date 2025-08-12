@@ -30,6 +30,7 @@ void display_hub(cairo_t *ctx, cairo_surface_t **img_hub, cairo_surface_t **img_
 void display_sel_button(cairo_t *ctx, const char *label, int pos, bool sel);
 void display_sel_screen(cairo_t *ctx, int amountPresets, int pagina, int cursor);
 void display_preset_edit_screen(cairo_t *ctx, int cursor);
+void display_id_screen(cairo_t *ctx, int amountFxTypes, int pagina, int cursor);
 void display_fx_screen(cairo_t *ctx, char fxLabel, float parametros[], int cursor);
 
 #endif

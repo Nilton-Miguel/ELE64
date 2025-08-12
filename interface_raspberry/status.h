@@ -143,6 +143,7 @@ public:
   int           getOption();
 
   int           getAmountPresets();
+  int           getAmountFx();
   int           getActivePreset();
   int           getActiveEffect();
   int           getActiveParam();
